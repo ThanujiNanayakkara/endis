@@ -1,16 +1,16 @@
 import React, {Component} from 'react';
 
 
-class Header extends Component{
+class Contact extends Component{
 
 
     render(){
         return(
             <div>
-                Header 
+                Contact
             </div>
         );
     }
 }
 
-export default Header;
+export default Contact;
