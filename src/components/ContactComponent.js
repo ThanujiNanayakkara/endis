@@ -29,7 +29,7 @@ class Contact extends Component{
                                     <h5>Our Address</h5>
                                     <address>
                                     University of Moratuwa<br />
-                                    Katubedda, Moratuwa<br />
+                                    ,Moratuwa<br />
                                     Sri Lanka<br />
                                     <i className="fa fa-phone"></i>: +94711608162<br />
                                     <i className="fa fa-fax"></i>: +94716853273<br />

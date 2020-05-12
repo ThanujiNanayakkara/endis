@@ -12,22 +12,14 @@
 
 .footer{
   /* background-color: #D1C4E9; */
-<<<<<<< HEAD
-  background-color: #EEF5B2;
-=======
   background-color: #FFE277;
->>>>>>> c7c8c7020101f057f598bdc86eb7539272748f41
   margin:0px auto;
   padding: 20px 0px 20px 0px;
 }
 .jumbotron {
   padding:70px 30px 70px 30px;
   margin:0px auto;
-<<<<<<< HEAD
-  background: #42DEE1 ;
-=======
   background: #58B4AE ;
->>>>>>> c7c8c7020101f057f598bdc86eb7539272748f41
   color: floralwhite;
 }
 .carousel-indicators li {
@@ -47,15 +39,12 @@ address{
 }
 
 
-<<<<<<< HEAD
-=======
 
 
 .navbar-dark {    
   background-color: #512DA8;    
 }
 
->>>>>>> c7c8c7020101f057f598bdc86eb7539272748f41
 
 
 
