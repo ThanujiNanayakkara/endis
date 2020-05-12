@@ -1,3 +1,5 @@
+//git log --all --decorate --oneline --graph
+
 import React, {Component} from 'react';
 
 import Header from './HeaderComponent';
