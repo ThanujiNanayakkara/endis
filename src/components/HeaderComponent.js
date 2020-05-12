@@ -23,7 +23,7 @@ class Header extends Component{
     render(){
         return(
             <React.Fragment>
-                <Navbar light  expand='md'>
+                <Navbar light expand='md'>
                     <div className = 'container'>
                         <NavbarToggler onClick={this.toggleNav}/>
                             <NavbarBrand className="mr-auto" href="/"> 
@@ -55,7 +55,7 @@ class Header extends Component{
                         <div className="row row-header">
                             <div className="col-12 col-sm-12">
                                 {/* <h1>Ristorante Con Fusion</h1> */}                               
-                                <h1 className="text-center font-italic">This is ENMON</h1>
+                                <h1 className="text-center font-italic">This is EnDis</h1>
                                 <p></p>
                                 <h4>Join with us to make better Energy Decisions</h4>
                                 <p></p>

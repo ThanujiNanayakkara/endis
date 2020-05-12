@@ -22,6 +22,15 @@
   background: #58B4AE ;
   color: floralwhite;
 }
+.carousel-indicators li {
+  background-color: #0f0f0f;
+}
+.Navbar{
+  color: #3FC5F0;
+}
+.navbar-light {
+  background-color: #3FC5F0;
+}
 
 address{
   font-size:80%;
