@@ -24,7 +24,7 @@ class Contact extends Component{
                             alt="First slide"
                             style={{height : 100}}
                             />
-                            <Carousel.Caption>
+                            {/* <Carousel.Caption>
                                 <div className="col-12 col-sm-4 offset-sm-1">
                                     <h5>Our Address</h5>
                                     <address>
@@ -36,7 +36,7 @@ class Contact extends Component{
                                     <i className="fa fa-envelope"></i>: <a href="mailto:confusion@food.net">endis@gmail.com</a>
                                     </address>
                                 </div>
-                            </Carousel.Caption>       
+                            </Carousel.Caption>        */}
                         </Carousel.Item>
                         <Carousel.Item>
                             <img
@@ -45,7 +45,7 @@ class Contact extends Component{
                                 alt="First slide"
                                 style={{height : 100}}
                                 />
-                            <Carousel.Caption>
+                            {/* <Carousel.Caption>
                                 <div className="col-12 col-sm-11 offset-sm-1">
                                     <div className="btn-group" role="group">
                                         <a role="button" className="btn btn-primary" href="tel:+85212345678"><i className="fa fa-phone"></i> Call</a>
@@ -53,7 +53,7 @@ class Contact extends Component{
                                         <a role="button" className="btn btn-success" href="mailto:confusion@food.net"><i className="fa fa-envelope-o"></i> Email</a>
                                     </div>
                                 </div>
-                            </Carousel.Caption>
+                            </Carousel.Caption> */}
                         </Carousel.Item>
                     </Carousel>
                 <div className="row row-content">

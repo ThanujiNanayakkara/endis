@@ -7,8 +7,10 @@ import Footer from './FooterComponent';
 import About from './AboutComponent';
 import Home from './HomeComponent';
 import Contact from './ContactComponent';
+import Dashboard from './DashboardComponent';
 
 import {Switch, Route, Redirect, withRouter} from 'react-router-dom';
+
 
 
 class Main extends Component{
@@ -21,6 +23,7 @@ class Main extends Component{
                         <Route path = '/home' component ={ () => <Home/>} />
                         <Route exact path = '/about' component ={ () => <About/>} />
                         <Route exact path = '/contact' component ={ () => <Contact/>} />
+                        <Route exact path = '/dashboard' component ={ () => <Dashboard/>} />
                         <Redirect to="/home"/>
                     </Switch>
                 <Footer/>

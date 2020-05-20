@@ -12,24 +12,28 @@
 
 .footer{
   /* background-color: #D1C4E9; */
+  font-family: 'Times New Roman', Times, serif;
+  font-size: 1.25em;
   background-color: #FFE277;
   margin:0px auto;
   padding: 20px 0px 20px 0px;
 }
 .jumbotron {
-  padding:70px 30px 70px 30px;
+  font-family: 'Times New Roman', Times, serif;
+  font-size: 1.5em;
+  text-align-last: center;
+  padding:110px 10px 10px 10px;
   margin:0px auto;
+  /* margin-top: 20px; */
   background: #58B4AE ;
   color: floralwhite;
 }
 .carousel-indicators li {
   background-color: #0f0f0f;
 }
-.Navbar{
-  color: #3FC5F0;
-}
-.navbar-light {
-  background-color: #3FC5F0;
+.navbar-light{
+  font-family: 'Times New Roman', Times, serif;
+  font-size: 1.3em;
 }
 
 address{
@@ -39,14 +43,9 @@ address{
 }
 
 
-
-
 .navbar-dark {    
   background-color: #512DA8;    
 }
-
-
-
 
 .page-enter {
   opacity: 0.01;
