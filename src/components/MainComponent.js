@@ -10,11 +10,12 @@ import Dashboard from './DashboardComponent';
 
 import {Switch, Route, Redirect, withRouter} from 'react-router-dom';
 import { connect } from 'react-redux';
-import { signUpUser, loginUser, logoutUser} from '../redux/ActionCreators';
+import { signUpUser, loginUser, logoutUser, productIdVerification, resetSignUpForm} from '../redux/ActionCreators';
 
 const mapStateToProps = state => {
     return {
-      auth: state.auth
+      auth: state.auth,
+      product: state.product,
     }
 }
 
@@ -22,6 +23,8 @@ const mapDispatchToProps = (dispatch) => ({
     loginUser: (creds) => dispatch(loginUser(creds)),
     signUpUser: (creds) => dispatch(signUpUser(creds)),
     logoutUser: () => dispatch(logoutUser()),
+    productIdVerification: (product)=>dispatch(productIdVerification(product)),
+    resetSignUpForm:()=>dispatch(resetSignUpForm()),
       });
   
 
@@ -48,7 +51,10 @@ class Main extends Component{
                 <Header auth={this.props.auth} 
                     loginUser={this.props.loginUser} 
                     logoutUser={this.props.logoutUser}
-                    signUpUser={this.props.signUpUser}/>
+                    signUpUser={this.props.signUpUser}
+                    product={this.props.product}
+                    productIdVerification={this.props.productIdVerification}
+                    resetSignUpForm={this.props.resetSignUpForm}/>
                     <Switch>
                         <Route path = '/home' component ={ () => <Home/>} />
                         <Route exact path = '/about' component ={ () => <About/>} />

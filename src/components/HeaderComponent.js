@@ -20,6 +20,7 @@ class Header extends Component{
         this.handleLogin= this.handleLogin.bind(this);
         this.handleSignUp= this.handleSignUp.bind(this);
         this.handleLogout= this.handleLogout.bind(this);
+        this.handleVerify= this.handleVerify.bind(this);
         // another method that can be followed, which saves us from doing it usig the arrow function
     }
 
@@ -40,11 +41,16 @@ class Header extends Component{
         this.setState({
             isModalSignUpOpen: !this.state.isModalSignUpOpen
         });
+        this.props.resetSignUpForm();
+
+    }
+    handleVerify(){
+        this.props.productIdVerification(this.productid.value);
     }
 
     handleSignUp(event){
         this.toggleModalSignUp();
-        this.props.signUpUser({username: this.username.value, password: this.password.value});
+        this.props.signUpUser({username: this.username.value, password: this.password.value, productid:this.productid.value});
         event.preventDefault();
     }
 
@@ -101,6 +107,37 @@ class Header extends Component{
                                 </Nav>
                                 <Nav className="ml-auto" navbar>
                                     <NavItem>
+                                        { !this.props.auth.isAuthenticated ?
+                                            <div>
+                                            <Button outline onClick={this.toggleModalLogin} style={{marginRight:10}}>
+                                                <span className="fa fa-sign-in fa-lg"></span> Sign in
+                                                {this.props.auth.isFetching ?
+                                                    <span className="fa fa-spinner fa-pulse fa-fw"></span>
+                                                    : null
+                                                }
+                                            </Button>
+                                            <Button outline onClick={this.toggleModalSignUp}>
+                                            <span className="fa fa-user-plus fa-lg"></span> Sign up
+                                            {this.props.auth.isFetching ?
+                                                <span className="fa fa-spinner fa-pulse fa-fw"></span>
+                                                : null
+                                            }
+                                            </Button>
+                                            </div>
+                                            :
+                                            <div>
+                                            
+                                            <Button outline onClick={this.handleLogout}>
+                                                <span className="fa fa-sign-out fa-lg"></span> Logout
+                                                {this.props.auth.isFetching ?
+                                                    <span className="fa fa-spinner fa-pulse fa-fw"></span>
+                                                    : null
+                                                }
+                                            </Button>
+                                            </div>
+                                        }
+                                    </NavItem>
+                                    {/* <NavItem>
                                         <Button outline onClick={this.toggleModal} style={{marginRight:10}}>
                                             <span className="fa fa-sign-in fa-lg"></span> Sign in
                                         </Button>
@@ -109,7 +146,7 @@ class Header extends Component{
                                         <Button outline onClick={this.toggleModalSignUp}>
                                             <span className="fa fa-user-plus fa-lg"></span> Sign up
                                         </Button>
-                                    </NavItem>
+                                    </NavItem> */}
                             </Nav>
                             </Collapse>
                     </div>
@@ -130,12 +167,12 @@ class Header extends Component{
                         </div>
                     </div>
                 </Jumbotron>
-                <Modal isOpen = {this.state.isModalOpen} toggle={this.toggleModal}>
-                    <ModalHeader toggle={this.toggleModal}>Login</ModalHeader>
+                <Modal isOpen = {this.state.isModalLoginOpen} toggle={this.toggleModalLogin}>
+                    <ModalHeader toggle={this.toggleModalLogin}>Login</ModalHeader>
                     <ModalBody>
                         <Form onSubmit={this.handleLogin}>
                             <FormGroup>
-                                <Label htmlFor="username">Username</Label>
+                                <Label htmlFor="username">Email</Label>
                                 <Input type="text" id="username" name="username"
                                 innerRef = {(input) => this.username = input} />       
                             </FormGroup>
@@ -156,35 +193,42 @@ class Header extends Component{
                 </ModalBody>
                 </Modal>
                 <Modal isOpen = {this.state.isModalSignUpOpen} toggle={this.toggleModalSignUp}>
-                    <ModalHeader toggle={this.toggleModalSignUp}>Login</ModalHeader>
+                    <ModalHeader toggle={this.toggleModalSignUp}>Sign Up</ModalHeader>
                     <ModalBody>
                         <Form onSubmit={this.handleSignUp}>
-                            <FormGroup>
+                            <FormGroup >
+                                <Label htmlFor="productid">Product ID</Label>
+                                <Input type="text" id="productid" name="productid" disabled={this.props.product.isVerified}
+                                innerRef = {(input) => this.productid = input} /> 
+                            </FormGroup>
+                            <Button className="primary" disabled={this.props.product.isVerified}
+                             onClick={this.handleVerify}>Verify</Button> 
+                             {/* <FormGroup>
+                                <p visible={this.props.product.isVerified}>Product Verification Successful...</p> 
+                            </FormGroup> */}
+                            <FormGroup >
                                 <Label htmlFor="firstname">Firstname</Label>
-                                <Input type="text" id="firstname" name="firstname"
+                                <Input type="text" id="firstname" name="firstname" disabled={!this.props.product.isVerified}
                                 innerRef = {(input) => this.firstname = input} />       
                             </FormGroup>
-                            <FormGroup>
+                            <FormGroup >
                                 <Label htmlFor="lastname">Lastname</Label>
-                                <Input type="text" id="lastname" name="lastname"
+                                <Input type="text" id="lastname" name="lastname" disabled={!this.props.product.isVerified}
                                 innerRef = {(input) => this.lastname = input} />       
                             </FormGroup>
+                            
                             <FormGroup>
-                                <Label htmlFor="productid">Product ID</Label>
-                                <Input type="text" id="productid" name="productid"
-                                innerRef = {(input) => this.productid = input} />       
-                            </FormGroup>
-                            <FormGroup>
-                                <Label htmlFor="username">Username</Label>
-                                <Input type="text" id="username" name="username"
+                                <Label htmlFor="username">Email</Label>
+                                <Input type="text" id="username" name="username" disabled={!this.props.product.isVerified}
                                 innerRef = {(input) => this.username = input} />       
                             </FormGroup>
-                            <FormGroup>
+                            <FormGroup >
                                 <Label htmlFor="password">Password</Label>
-                                <Input type="password" id="password" name="password" 
+                                <Input type="password" id="password" name="password"  disabled={!this.props.product.isVerified}
                                 innerRef = {(input) => this.password = input} />       
                             </FormGroup>
-                            <Button type="submit" value="submit" className="primary">Sign Up</Button>
+                            <Button type="submit" value="submit" className="primary" disabled={!this.props.product.isVerified}>Sign Up</Button>
+
                         </Form>
                 </ModalBody>
                 </Modal>
