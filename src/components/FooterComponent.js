@@ -27,8 +27,8 @@ class Footer extends Component{
 		              Katubedda, Moratuwa<br />
 		              <i className="fa fa-phone fa-lg"></i>: +94 71 160 8162<br />
 		              <i className="fa fa-fax fa-lg"></i>: +94 71 685 3273<br />
-		              <i className="fa fa-envelope fa-lg"></i>: <a href="mailto:confusion@food.net">
-                         confusion@food.net</a>
+		              <i className="fa fa-envelope fa-lg"></i>: <a href="disaggreagtaion@energy.net">
+                         disaggreagtaion@energy.net</a>
                     </address>
                 </div>
                 <div className="col-12 col-sm-4 align-self-center">

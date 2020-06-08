@@ -16,13 +16,13 @@ class Contact extends Component{
                         <BreadcrumbItem active>Contact Us</BreadcrumbItem>
                     </Breadcrumb>  
                 </div>
-                <Carousel >
+                <Carousel className="align-center" >
                         <Carousel.Item>
                         <img
-                            className="d-block w-100 h-100"
+                            className="d-block w- 70 h-50"
                             src="assets/images/mailbox.jpg"
                             alt="First slide"
-                            style={{height : 100}}
+                            style={{height : 50}}
                             />
                             {/* <Carousel.Caption>
                                 <div className="col-12 col-sm-4 offset-sm-1">
@@ -40,10 +40,10 @@ class Contact extends Component{
                         </Carousel.Item>
                         <Carousel.Item>
                             <img
-                                className="d-block w-100 h-100"
+                                className="d-block w-70 h-50"
                                 src="assets/images/social.png"
                                 alt="First slide"
-                                style={{height : 100}}
+                                style={{height : 50}}
                                 />
                             {/* <Carousel.Caption>
                                 <div className="col-12 col-sm-11 offset-sm-1">

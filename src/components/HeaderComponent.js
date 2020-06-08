@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import {Navbar, NavbarBrand, Nav, NavbarToggler, Collapse, NavItem, 
     Jumbotron, Button, Modal, ModalHeader, ModalBody, Form, FormGroup, Input, Label} from 'reactstrap';
 import {NavLink} from 'react-router-dom';
-import Dashboard from './DashboardComponent';
+
 
 
 class Header extends Component{
@@ -11,11 +11,15 @@ class Header extends Component{
         super(props);
         this.state={
             isNavOpen: false,
-            isModalOpen: false
+            isModalLoginOpen: false,
+            isModalSignUpOpen: false,
         };
         this.toggleNav= this.toggleNav.bind(this);
-        this.toggleModal= this.toggleModal.bind(this);
+        this.toggleModalLogin= this.toggleModalLogin.bind(this);
+        this.toggleModalSignUp= this.toggleModalSignUp.bind(this);
         this.handleLogin= this.handleLogin.bind(this);
+        this.handleSignUp= this.handleSignUp.bind(this);
+        this.handleLogout= this.handleLogout.bind(this);
         // another method that can be followed, which saves us from doing it usig the arrow function
     }
 
@@ -25,19 +29,35 @@ class Header extends Component{
         });
     }
 
-    toggleModal(){
+    toggleModalLogin(){
         this.setState({
-            isModalOpen: !this.state.isModalOpen
+            isModalLoginOpen: !this.state.isModalLoginOpen
         });
 
     }
 
-    handleLogin(event){
-        this.toggleModal();
-        alert("Username: " + this.username.value + " Password: "+ this.password.value + 
-            " Remember: " + this.remember.checked);
+    toggleModalSignUp(){
+        this.setState({
+            isModalSignUpOpen: !this.state.isModalSignUpOpen
+        });
+    }
+
+    handleSignUp(event){
+        this.toggleModalSignUp();
+        this.props.signUpUser({username: this.username.value, password: this.password.value});
         event.preventDefault();
     }
+
+    handleLogin(event){
+        this.toggleModalLogin();
+        this.props.loginUser({username: this.username.value, password: this.password.value});
+        event.preventDefault();
+    }
+
+    handleLogout() {
+        this.props.logoutUser();
+    }
+
     render(){
 
         const PersonalData = ({ loggedIn}) => {
@@ -61,15 +81,13 @@ class Header extends Component{
                                 <img src="assets/images/logo.png" height="80" width="80" alt="EnDis"></img>
                             </NavbarBrand>
                             <Collapse isOpen= {this.state.isNavOpen} navbar>
-                                <Nav navbar>
-                                            
+                                <Nav navbar>                            
                                     <NavItem>
                                         <NavLink className="nav-link" to="/home">
                                             <span className="fa fa-home fa-lg"></span>Home
                                         </NavLink>
                                     </NavItem>
-                                    <PersonalData loggedIn={true}/>
-                                    
+                                    <PersonalData loggedIn={this.props.auth.isAuthenticated}/>   
                                     <NavItem>
                                         <NavLink className="nav-link" to="/about">
                                             <span className="fa fa-info fa-lg"></span>About Us
@@ -88,7 +106,7 @@ class Header extends Component{
                                         </Button>
                                     </NavItem>
                                     <NavItem>
-                                        <Button outline onClick={this.toggleModal}>
+                                        <Button outline onClick={this.toggleModalSignUp}>
                                             <span className="fa fa-user-plus fa-lg"></span> Sign up
                                         </Button>
                                     </NavItem>
@@ -135,10 +153,42 @@ class Header extends Component{
                             </FormGroup>
                             <Button type="submit" value="submit" className="primary">Login</Button>
                         </Form>
-
-                    </ModalBody>
-
+                </ModalBody>
                 </Modal>
+                <Modal isOpen = {this.state.isModalSignUpOpen} toggle={this.toggleModalSignUp}>
+                    <ModalHeader toggle={this.toggleModalSignUp}>Login</ModalHeader>
+                    <ModalBody>
+                        <Form onSubmit={this.handleSignUp}>
+                            <FormGroup>
+                                <Label htmlFor="firstname">Firstname</Label>
+                                <Input type="text" id="firstname" name="firstname"
+                                innerRef = {(input) => this.firstname = input} />       
+                            </FormGroup>
+                            <FormGroup>
+                                <Label htmlFor="lastname">Lastname</Label>
+                                <Input type="text" id="lastname" name="lastname"
+                                innerRef = {(input) => this.lastname = input} />       
+                            </FormGroup>
+                            <FormGroup>
+                                <Label htmlFor="productid">Product ID</Label>
+                                <Input type="text" id="productid" name="productid"
+                                innerRef = {(input) => this.productid = input} />       
+                            </FormGroup>
+                            <FormGroup>
+                                <Label htmlFor="username">Username</Label>
+                                <Input type="text" id="username" name="username"
+                                innerRef = {(input) => this.username = input} />       
+                            </FormGroup>
+                            <FormGroup>
+                                <Label htmlFor="password">Password</Label>
+                                <Input type="password" id="password" name="password" 
+                                innerRef = {(input) => this.password = input} />       
+                            </FormGroup>
+                            <Button type="submit" value="submit" className="primary">Sign Up</Button>
+                        </Form>
+                </ModalBody>
+                </Modal>
+                
             </React.Fragment>
             
         );
