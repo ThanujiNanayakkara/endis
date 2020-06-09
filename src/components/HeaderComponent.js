@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import {Navbar, NavbarBrand, Nav, NavbarToggler, Collapse, NavItem, 
     Jumbotron, Button, Modal, ModalHeader, ModalBody, Form, FormGroup, Input, Label} from 'reactstrap';
 import {NavLink} from 'react-router-dom';
+import { auth, firestore, fireauth, firebasestore } from '../firebase/firebase';
 
 
 
@@ -13,6 +14,9 @@ class Header extends Component{
             isNavOpen: false,
             isModalLoginOpen: false,
             isModalSignUpOpen: false,
+            isVerified:false,
+            productDocId: ""
+
         };
         this.toggleNav= this.toggleNav.bind(this);
         this.toggleModalLogin= this.toggleModalLogin.bind(this);
@@ -37,20 +41,58 @@ class Header extends Component{
 
     }
 
+    // toggleModalSignUp(){
+    //     this.setState({
+    //         isModalSignUpOpen: !this.state.isModalSignUpOpen
+    //     });
+    //     this.props.resetSignUpForm();
+    // }
     toggleModalSignUp(){
-        this.setState({
-            isModalSignUpOpen: !this.state.isModalSignUpOpen
-        });
-        this.props.resetSignUpForm();
+            this.setState({
+                isModalSignUpOpen: !this.state.isModalSignUpOpen,
+                isVerified: false,
+            });
+        }
 
-    }
     handleVerify(){
-        this.props.productIdVerification(this.productid.value);
+        var productsRef = firestore.collection("issuedProducts");
+         productsRef.where("productId", "==", this.productid.value).where("active", "==", false)
+            .get()
+            .then(querySnapshot => {
+                if (!querySnapshot.empty){
+                    this.setState({
+                        isVerified: !this.state.isVerified
+                    });
+                    alert("Device verification is successful. Proceed to Sign Up");
+                    this.setState({
+                        productDocId: querySnapshot.docs[0].id,
+                    });
+                    // productsRef.doc(this.state.productDocId).update({
+                    //     active: true,
+                    // })
+                    // .then(() => {
+                    //     console.log("Document successfully written!");
+                    // })
+                    // .catch(function(error) {
+                    //     console.error("Error writing document: ", error);
+                    // });                
+                }
+                else{
+                    //dispatch(productIdError("Not a valid device"));
+                    alert("Not a valid device");
+                }
+            })
+            .catch(error => console.log("Error"));
     }
+
+    // handleVerify(){
+
+    //     this.props.productIdVerification(this.productid.value);
+    // }
 
     handleSignUp(event){
         this.toggleModalSignUp();
-        this.props.signUpUser({username: this.username.value, password: this.password.value, productid:this.productid.value});
+        this.props.signUpUser({username: this.username.value, password: this.password.value, docId:this.state.productDocId});
         event.preventDefault();
     }
 
@@ -198,36 +240,36 @@ class Header extends Component{
                         <Form onSubmit={this.handleSignUp}>
                             <FormGroup >
                                 <Label htmlFor="productid">Product ID</Label>
-                                <Input type="text" id="productid" name="productid" disabled={this.props.product.isVerified}
+                                <Input type="text" id="productid" name="productid" disabled={this.state.isVerified}
                                 innerRef = {(input) => this.productid = input} /> 
                             </FormGroup>
-                            <Button className="primary" disabled={this.props.product.isVerified}
+                            <Button className="primary" disabled={this.state.isVerified}
                              onClick={this.handleVerify}>Verify</Button> 
                              {/* <FormGroup>
                                 <p visible={this.props.product.isVerified}>Product Verification Successful...</p> 
                             </FormGroup> */}
                             <FormGroup >
                                 <Label htmlFor="firstname">Firstname</Label>
-                                <Input type="text" id="firstname" name="firstname" disabled={!this.props.product.isVerified}
+                                <Input type="text" id="firstname" name="firstname" disabled={!this.state.isVerified}
                                 innerRef = {(input) => this.firstname = input} />       
                             </FormGroup>
                             <FormGroup >
                                 <Label htmlFor="lastname">Lastname</Label>
-                                <Input type="text" id="lastname" name="lastname" disabled={!this.props.product.isVerified}
+                                <Input type="text" id="lastname" name="lastname" disabled={!this.state.isVerified}
                                 innerRef = {(input) => this.lastname = input} />       
                             </FormGroup>
                             
                             <FormGroup>
                                 <Label htmlFor="username">Email</Label>
-                                <Input type="text" id="username" name="username" disabled={!this.props.product.isVerified}
+                                <Input type="text" id="username" name="username" disabled={!this.state.isVerified}
                                 innerRef = {(input) => this.username = input} />       
                             </FormGroup>
                             <FormGroup >
                                 <Label htmlFor="password">Password</Label>
-                                <Input type="password" id="password" name="password"  disabled={!this.props.product.isVerified}
+                                <Input type="password" id="password" name="password"  disabled={!this.state.isVerified}
                                 innerRef = {(input) => this.password = input} />       
                             </FormGroup>
-                            <Button type="submit" value="submit" className="primary" disabled={!this.props.product.isVerified}>Sign Up</Button>
+                            <Button type="submit" value="submit" className="primary" disabled={!this.state.isVerified}>Sign Up</Button>
 
                         </Form>
                 </ModalBody>
@@ -242,3 +284,44 @@ class Header extends Component{
 
 
 export default Header;
+
+{/* <Modal isOpen = {this.state.isModalSignUpOpen} toggle={this.toggleModalSignUp}>
+<ModalHeader toggle={this.toggleModalSignUp}>Sign Up</ModalHeader>
+<ModalBody>
+    <Form onSubmit={this.handleSignUp}>
+        <FormGroup >
+            <Label htmlFor="productid">Product ID</Label>
+            <Input type="text" id="productid" name="productid" disabled={this.props.product.isVerified}
+            innerRef = {(input) => this.productid = input} /> 
+        </FormGroup>
+        <Button className="primary" disabled={this.props.product.isVerified}
+         onClick={this.handleVerify}>Verify</Button> 
+         <FormGroup>
+            <p visible={this.props.product.isVerified}>Product Verification Successful...</p> 
+        </FormGroup>
+        <FormGroup >
+            <Label htmlFor="firstname">Firstname</Label>
+            <Input type="text" id="firstname" name="firstname" disabled={!this.props.product.isVerified}
+            innerRef = {(input) => this.firstname = input} />       
+        </FormGroup>
+        <FormGroup >
+            <Label htmlFor="lastname">Lastname</Label>
+            <Input type="text" id="lastname" name="lastname" disabled={!this.props.product.isVerified}
+            innerRef = {(input) => this.lastname = input} />       
+        </FormGroup>
+        
+        <FormGroup>
+            <Label htmlFor="username">Email</Label>
+            <Input type="text" id="username" name="username" disabled={!this.props.product.isVerified}
+            innerRef = {(input) => this.username = input} />       
+        </FormGroup>
+        <FormGroup >
+            <Label htmlFor="password">Password</Label>
+            <Input type="password" id="password" name="password"  disabled={!this.props.product.isVerified}
+            innerRef = {(input) => this.password = input} />       
+        </FormGroup>
+        <Button type="submit" value="submit" className="primary" disabled={!this.props.product.isVerified}>Sign Up</Button>
+
+    </Form>
+</ModalBody>
+</Modal> */}

@@ -5,7 +5,7 @@ import { auth, firestore, fireauth, firebasestore } from '../firebase/firebase';
 export const productIdVerification = (product) => (dispatch) => {
 
     dispatch(requestProductId());
-  var productsRef = firestore.collection("issuedProducts");
+   var productsRef = firestore.collection("issuedProducts");
     return productsRef.where("productId", "==", product).where("active", "==", false)
         .get()
         .then(querySnapshot => {
@@ -66,18 +66,30 @@ export const signUpError = (message) => {
     }
 }
 
+
+
 export const signUpUser = (creds) => (dispatch) => {
     // We dispatch requestLogin to kickoff the call to the API
     dispatch(requestSignUp(creds));
     return auth.createUserWithEmailAndPassword(creds.username, creds.password)
-    .then(() => {
-        var user = auth.currentUser;
-        localStorage.setItem('user', JSON.stringify(user));
-        // Dispatch the success action
-        dispatch(receiveSignUp(user));
-    })
-    .catch(error => dispatch(signUpError(error.message)))
-};
+            .then(() => {
+            var user = auth.currentUser;
+            localStorage.setItem('user', JSON.stringify(user));
+            // Dispatch the success action
+            dispatch(receiveSignUp(user));
+            firestore.collection("issuedProducts").doc(creds.docId).update({
+                    active: true,
+            })
+            .then(() => {
+                console.log("Document successfully written!");
+            })
+            .catch(function(error) {
+                console.error("Error writing document: ", error);
+            });    
+        })
+        .catch(error => {dispatch(signUpError(error.message)); return});
+    };
+    
 
 export const requestLogin = () => {
     return {
