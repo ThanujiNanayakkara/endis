@@ -13,7 +13,7 @@ export const productIdVerification = (product) => (dispatch) => {
                 dispatch(receiveProductId());
                 alert("Device verification is successful. Proceed to Sign Up");
             }
-            else{
+            else {
                 dispatch(productIdError("Not a valid device"));
                 alert("Not a valid device");
             }
@@ -66,30 +66,38 @@ export const signUpError = (message) => {
     }
 }
 
-
-
 export const signUpUser = (creds) => (dispatch) => {
     // We dispatch requestLogin to kickoff the call to the API
-    dispatch(requestSignUp(creds));
-    return auth.createUserWithEmailAndPassword(creds.username, creds.password)
-            .then(() => {
-            var user = auth.currentUser;
-            localStorage.setItem('user', JSON.stringify(user));
-            // Dispatch the success action
-            dispatch(receiveSignUp(user));
-            firestore.collection("issuedProducts").doc(creds.docId).update({
-                    active: true,
+    dispatch(requestSignUp());
+    auth.createUserWithEmailAndPassword(creds.username,creds.password)
+    .then(data=>{
+        if ((data.user.uid)!=null){
+            var user = data.user;
+            firestore.collection('Users').doc(data.user.uid).set({
+                email:user.email,
+                Id: user.uid
+
             })
-            .then(() => {
-                console.log("Document successfully written!");
-            })
-            .catch(function(error) {
-                console.error("Error writing document: ", error);
-            });    
-        })
-        .catch(error => {dispatch(signUpError(error.message)); return});
-    };
+            .then(()=>{dispatch(receiveSignUp(data.user))})
+            .catch(()=>{})
+        }
+    }).
+    catch((err)=>{dispatch(signUpError())})
+}
+
+
     
+export const authStateChange=()=>(dispatch) =>{
+    return auth.onAuthStateChanged(function(user) {
+        if (user) {
+          // User is signed in.
+          dispatch(receiveLogin(user));
+        } else {
+          // No user is signed in.
+          dispatch(loginError());
+        }
+      });
+    }
 
 export const requestLogin = () => {
     return {

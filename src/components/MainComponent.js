@@ -10,7 +10,7 @@ import Dashboard from './DashboardComponent';
 
 import {Switch, Route, Redirect, withRouter} from 'react-router-dom';
 import { connect } from 'react-redux';
-import { signUpUser, loginUser, logoutUser, productIdVerification, resetSignUpForm} from '../redux/ActionCreators';
+import { signUpUser, loginUser, logoutUser, productIdVerification, resetSignUpForm, authStateChange} from '../redux/ActionCreators';
 
 const mapStateToProps = state => {
     return {
@@ -25,10 +25,15 @@ const mapDispatchToProps = (dispatch) => ({
     logoutUser: () => dispatch(logoutUser()),
     productIdVerification: (product)=>dispatch(productIdVerification(product)),
     resetSignUpForm:()=>dispatch(resetSignUpForm()),
+    authStateChange:()=>dispatch(authStateChange()),
       });
   
 
 class Main extends Component{
+
+    componentDidMount(){
+        this.props.authStateChange();
+    }
 
     componentWillUnmount() {
         this.props.logoutUser();
@@ -55,6 +60,7 @@ class Main extends Component{
                     product={this.props.product}
                     productIdVerification={this.props.productIdVerification}
                     resetSignUpForm={this.props.resetSignUpForm}/>
+                 
                     <Switch>
                         <Route path = '/home' component ={ () => <Home/>} />
                         <Route exact path = '/about' component ={ () => <About/>} />
@@ -62,6 +68,7 @@ class Main extends Component{
                         <PrivateRoute exact path="/dashboard" component={() => <Dashboard />} />
                         <Redirect to="/home"/>
                     </Switch>
+                  
                 <Footer/>
             </div>
         )

@@ -25,6 +25,8 @@ class Header extends Component{
         this.handleSignUp= this.handleSignUp.bind(this);
         this.handleLogout= this.handleLogout.bind(this);
         this.handleVerify= this.handleVerify.bind(this);
+        
+
         // another method that can be followed, which saves us from doing it usig the arrow function
     }
 
@@ -66,19 +68,11 @@ class Header extends Component{
                     alert("Device verification is successful. Proceed to Sign Up");
                     this.setState({
                         productDocId: querySnapshot.docs[0].id,
-                    });
-                    // productsRef.doc(this.state.productDocId).update({
-                    //     active: true,
-                    // })
-                    // .then(() => {
-                    //     console.log("Document successfully written!");
-                    // })
-                    // .catch(function(error) {
-                    //     console.error("Error writing document: ", error);
-                    // });                
+                    }); 
+                    localStorage.setItem('productDocId',this.state.productDocId);
+             
                 }
                 else{
-                    //dispatch(productIdError("Not a valid device"));
                     alert("Not a valid device");
                 }
             })
@@ -91,10 +85,12 @@ class Header extends Component{
     // }
 
     handleSignUp(event){
-        this.toggleModalSignUp();
-        this.props.signUpUser({username: this.username.value, password: this.password.value, docId:this.state.productDocId});
         event.preventDefault();
+        this.toggleModalSignUp();
+        this.props.signUpUser({username: this.username.value, password: this.password.value, productId:this.state.productDocId});
+          
     }
+
 
     handleLogin(event){
         this.toggleModalLogin();
@@ -106,8 +102,12 @@ class Header extends Component{
         this.props.logoutUser();
     }
 
-    render(){
 
+    componentDidUpdate(){
+        
+    }
+
+    render(){
         const PersonalData = ({ loggedIn}) => {
             if (!loggedIn) return null;
           

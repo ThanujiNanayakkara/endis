@@ -1,4 +1,4 @@
-import { createStore, combineReducers, applyMiddleware } from 'redux';
+import { createStore, combineReducers, applyMiddleware, compose } from 'redux';
 import { Auth } from './auth';
 import { Product } from './productIds';
 import thunk from 'redux-thunk';
@@ -11,8 +11,8 @@ export const ConfigureStore = () => {
             auth: Auth,
             product:Product,
         }),
-        applyMiddleware(thunk, logger)
-    );
+        applyMiddleware(thunk, logger))
+    
 
     return store;
 }
