@@ -25,7 +25,6 @@ class Header extends Component{
         this.handleSignUp= this.handleSignUp.bind(this);
         this.handleLogout= this.handleLogout.bind(this);
         this.handleVerify= this.handleVerify.bind(this);
-        
 
         // another method that can be followed, which saves us from doing it usig the arrow function
     }
@@ -43,12 +42,6 @@ class Header extends Component{
 
     }
 
-    // toggleModalSignUp(){
-    //     this.setState({
-    //         isModalSignUpOpen: !this.state.isModalSignUpOpen
-    //     });
-    //     this.props.resetSignUpForm();
-    // }
     toggleModalSignUp(){
             this.setState({
                 isModalSignUpOpen: !this.state.isModalSignUpOpen,
@@ -69,7 +62,7 @@ class Header extends Component{
                     this.setState({
                         productDocId: querySnapshot.docs[0].id,
                     }); 
-                    localStorage.setItem('productDocId',this.state.productDocId);
+                    localStorage.setItem("productDocId",this.state.productDocId);
              
                 }
                 else{
@@ -77,31 +70,29 @@ class Header extends Component{
                 }
             })
             .catch(error => console.log("Error"));
+     
     }
 
-    // handleVerify(){
-
-    //     this.props.productIdVerification(this.productid.value);
-    // }
 
     handleSignUp(event){
         event.preventDefault();
         this.toggleModalSignUp();
-        this.props.signUpUser({username: this.username.value, password: this.password.value, productId:this.state.productDocId});
-          
+        this.props.signUpUser({username: this.username.value, password: this.password.value, docId:this.state.productDocId});
+             
     }
 
 
     handleLogin(event){
+        event.preventDefault();
         this.toggleModalLogin();
         this.props.loginUser({username: this.username.value, password: this.password.value});
-        event.preventDefault();
+        
     }
 
     handleLogout() {
         this.props.logoutUser();
+        
     }
-
 
     componentDidUpdate(){
         
@@ -248,16 +239,6 @@ class Header extends Component{
                              {/* <FormGroup>
                                 <p visible={this.props.product.isVerified}>Product Verification Successful...</p> 
                             </FormGroup> */}
-                            <FormGroup >
-                                <Label htmlFor="firstname">Firstname</Label>
-                                <Input type="text" id="firstname" name="firstname" disabled={!this.state.isVerified}
-                                innerRef = {(input) => this.firstname = input} />       
-                            </FormGroup>
-                            <FormGroup >
-                                <Label htmlFor="lastname">Lastname</Label>
-                                <Input type="text" id="lastname" name="lastname" disabled={!this.state.isVerified}
-                                innerRef = {(input) => this.lastname = input} />       
-                            </FormGroup>
                             
                             <FormGroup>
                                 <Label htmlFor="username">Email</Label>

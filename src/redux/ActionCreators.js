@@ -70,17 +70,11 @@ export const signUpUser = (creds) => (dispatch) => {
     // We dispatch requestLogin to kickoff the call to the API
     dispatch(requestSignUp());
     auth.createUserWithEmailAndPassword(creds.username,creds.password)
-    .then(data=>{
-        if ((data.user.uid)!=null){
-            var user = data.user;
-            firestore.collection('Users').doc(data.user.uid).set({
-                email:user.email,
-                Id: user.uid
+    .then(()=>{
+        var user = auth.currentUser;
+        localStorage.setItem('user', JSON.stringify(user));
+        dispatch(receiveSignUp(user));
 
-            })
-            .then(()=>{dispatch(receiveSignUp(data.user))})
-            .catch(()=>{})
-        }
     }).
     catch((err)=>{dispatch(signUpError())})
 }
@@ -92,6 +86,15 @@ export const authStateChange=()=>(dispatch) =>{
         if (user) {
           // User is signed in.
           dispatch(receiveLogin(user));
+          let doc=localStorage.getItem("productDocId");
+          if(doc!=null){
+              localStorage.removeItem("productDocId");
+              firestore.collection("issuedProducts").doc(doc).update({
+                  active:user.uid,
+              })
+              .then(()=>{})
+              .catch(()=>{})
+          }
         } else {
           // No user is signed in.
           dispatch(loginError());
