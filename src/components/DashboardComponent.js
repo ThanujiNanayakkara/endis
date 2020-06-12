@@ -1,16 +1,25 @@
 import React, {Component} from 'react';
 import { Card, CardImg, CardText, CardBody, CardTitle, CardSubtitle, Button,  Modal, ModalHeader, ModalBody, Form, FormGroup, Input, Label } from 'reactstrap';
 import { auth, firestore, fireauth, firebasestore } from '../firebase/firebase';
+//new
+import ReactDOM from 'react-dom';
+import Graph from './GraphComponent';
 
 class Dashboard extends Component{
     constructor(props){
         super(props);
         this.state={
             isUpdateOpen:false,
-
+            //new
+            house: '',
+            equipment: '',
+            data:[]
         };
         this.updateProfile= this.updateProfile.bind(this);
         this.toggleModalUpdate= this.toggleModalUpdate.bind(this);
+        //new
+        this.handleChange = this.handleChange.bind(this);
+        this.handleSubmit = this.handleSubmit.bind(this);
 
     }
 
@@ -36,6 +45,42 @@ class Dashboard extends Component{
     componentDidUpdate(){
     }
 
+    //new
+    handleChange(event) {
+        this.setState({
+            [event.target.name] : event.target.value
+        })
+        event.preventDefault();
+    }
+
+    //new
+    handleSubmit(event) {
+        alert('The required house is: ' + this.state.house + " and the commponent is " + this.state.equipment);
+        {this.readDB(this.state.house, this.state.equipment)};
+        this.state.data=[];
+        event.preventDefault();
+    }
+
+    //new
+    readDB=(house,equipment)=>{
+
+        const renderResult=(data)=>{
+            return(<div>{data}</div>)
+        }
+
+        var houseDB = firestore.collection('readings').doc('houses').collection(house);
+        houseDB.get().then((snapshot)=>{
+            var XVal=1;
+            snapshot.docs.forEach(doc => {
+                const YVal=doc.data()[equipment]
+                this.state.data.push({x:XVal,y:YVal})
+                console.log(this.state.data)
+                XVal=XVal+1
+            })
+        })
+        ReactDOM.render(renderResult(<Graph data={this.state.data}></Graph>), document.getElementById('readings'));            
+        
+    }
 
     render(){
         const readUserData = ()=>{
@@ -71,7 +116,24 @@ class Dashboard extends Component{
                     </Modal>
                     
                 </Card>
-
+            
+                {/* new */}
+                <h1>Dashboard</h1>
+                <h3>Readings</h3>
+                <div>
+                    <form onSubmit={this.handleSubmit}>
+                        <label>
+                            Name:
+                            <input type="text" name='house' house={this.state.house} onChange={this.handleChange} />
+                        </label>
+                        <label>
+                            Equipment:
+                            <input type="text" name='equipment' equipment={this.state.equipment} onChange={this.handleChange} />
+                        </label>
+                        <input type="submit" value="Submit" />
+                    </form>
+                </div>
+                <div id='readings'></div>
             </div>
         );
     }
