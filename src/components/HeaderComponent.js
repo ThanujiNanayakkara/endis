@@ -2,8 +2,10 @@ import React, {Component} from 'react';
 import {Navbar, NavbarBrand, Nav, NavbarToggler, Collapse, NavItem, 
     Jumbotron, Button, Modal, ModalHeader, ModalBody, Form, FormGroup, Input, Label} from 'reactstrap';
 import {NavLink} from 'react-router-dom';
-import { auth, firestore, fireauth, firebasestore } from '../firebase/firebase';
-
+import { auth, firestore } from '../firebase/firebase';
+const firebase = require("firebase");
+// Required for side-effects
+require("firebase/functions");
 
 
 class Header extends Component{
@@ -77,7 +79,15 @@ class Header extends Component{
     handleSignUp(event){
         event.preventDefault();
         this.toggleModalSignUp();
-        this.props.signUpUser({username: this.username.value, password: this.password.value, docId:this.state.productDocId});
+        //this.props.signUpUser({username: this.username.value, password: this.password.value, docId:this.state.productDocId});
+        this.props.signUpUser({username: this.username.value, password: this.password.value});
+        // var addMessage = firebase.functions().httpsCallable('addMessage');
+        // addMessage({text: "messageText"}).then(function(result) {
+        // // Read result of the Cloud Function.
+        // //var sanitizedMessage = result.data.text;
+        //     // ...
+        // });
+       
              
     }
 
@@ -104,24 +114,26 @@ class Header extends Component{
           
             return (
                 <NavItem >
-                    <NavLink className="nav-link" to="/dashboard">
-                        <span className="fa fa-line-chart fa-lg"></span>Dashboard
-                    </NavLink>
-                </NavItem>
+                <NavLink className="nav-link" to="/dashboard">
+                    <span className="fa fa-line-chart fa-lg"></span>Dashboard
+                </NavLink>
+                </NavItem>  
+                
+                
             );
           };
 
         return(
             <React.Fragment>
-                <Navbar light expand='md' fixed="top" color="white">
+                <Navbar light expand='md' fixed="top" color="white" >
                     <div className = 'container'>
                         <NavbarToggler onClick={this.toggleNav}/>
                             <NavbarBrand className="mr-auto" href="/"> 
                                 <img src="assets/images/logo.png" height="80" width="80" alt="EnDis"></img>
                             </NavbarBrand>
                             <Collapse isOpen= {this.state.isNavOpen} navbar>
-                                <Nav navbar>                            
-                                    <NavItem>
+                            <Nav navbar>                            
+                                    <NavItem >
                                         <NavLink className="nav-link" to="/home">
                                             <span className="fa fa-home fa-lg"></span>Home
                                         </NavLink>
@@ -181,6 +193,7 @@ class Header extends Component{
                                         </Button>
                                     </NavItem> */}
                             </Nav>
+                             
                             </Collapse>
                     </div>
                 </Navbar>
@@ -229,29 +242,17 @@ class Header extends Component{
                     <ModalHeader toggle={this.toggleModalSignUp}>Sign Up</ModalHeader>
                     <ModalBody>
                         <Form onSubmit={this.handleSignUp}>
-                            <FormGroup >
-                                <Label htmlFor="productid">Product ID</Label>
-                                <Input type="text" id="productid" name="productid" disabled={this.state.isVerified}
-                                innerRef = {(input) => this.productid = input} /> 
-                            </FormGroup>
-                            <Button className="primary" disabled={this.state.isVerified}
-                             onClick={this.handleVerify}>Verify</Button> 
-                             {/* <FormGroup>
-                                <p visible={this.props.product.isVerified}>Product Verification Successful...</p> 
-                            </FormGroup> */}
-                            
                             <FormGroup>
                                 <Label htmlFor="username">Email</Label>
-                                <Input type="text" id="username" name="username" disabled={!this.state.isVerified}
+                                <Input type="text" id="username" name="username" 
                                 innerRef = {(input) => this.username = input} />       
                             </FormGroup>
                             <FormGroup >
                                 <Label htmlFor="password">Password</Label>
-                                <Input type="password" id="password" name="password"  disabled={!this.state.isVerified}
+                                <Input type="password" id="password" name="password"  
                                 innerRef = {(input) => this.password = input} />       
                             </FormGroup>
-                            <Button type="submit" value="submit" className="primary" disabled={!this.state.isVerified}>Sign Up</Button>
-
+                            <Button type="submit" value="submit" className="primary" >Sign Up</Button>
                         </Form>
                 </ModalBody>
                 </Modal>

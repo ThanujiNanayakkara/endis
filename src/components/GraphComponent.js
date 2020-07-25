@@ -9,9 +9,7 @@ class Graph extends Component {
         super(props);
     
 	}
-
     render() {
-
         const options = {
 			theme: "light1",
 			animationEnabled: true,
@@ -26,8 +24,7 @@ class Graph extends Component {
 				type: "area",
                 dataPoints: this.props.data
        	}]
-        }
-          
+        }      
      return (
           <CanvasJSChart options = {options}/>
       );

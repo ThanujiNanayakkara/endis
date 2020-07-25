@@ -13,3 +13,4 @@ export const fireauth = firebase.auth;
 // firebase.firestore().settings(settings);
 export const firestore = firebase.firestore();
 export const firebasestore = firebase.firestore;
+export const functions = firebase.functions();

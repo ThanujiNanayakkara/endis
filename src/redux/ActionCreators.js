@@ -86,15 +86,15 @@ export const authStateChange=()=>(dispatch) =>{
         if (user) {
           // User is signed in.
           dispatch(receiveLogin(user));
-          let doc=localStorage.getItem("productDocId");
-          if(doc!=null){
-              localStorage.removeItem("productDocId");
-              firestore.collection("issuedProducts").doc(doc).update({
-                  active:user.uid,
-              })
-              .then(()=>{})
-              .catch(()=>{})
-          }
+        //   let doc=localStorage.getItem("productDocId");
+        //   if(doc!=null){
+        //       localStorage.removeItem("productDocId");
+        //       firestore.collection("issuedProducts").doc(doc).update({
+        //           active:user.uid,
+        //       })
+        //       .then(()=>{})
+        //       .catch(()=>{})
+        //   }
         } else {
           // No user is signed in.
           dispatch(loginError());
