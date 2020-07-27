@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import { Card, CardImg, CardText, CardBody, CardTitle, CardSubtitle, Button,  Modal, ModalHeader, ModalBody, Form, FormGroup, Input, Label, ListGroup, ListGroupItem } from 'reactstrap';
 import { auth, firestore } from '../firebase/firebase';
+import {Line} from 'react-chartjs-2';
 //new
 import ReactDOM from 'react-dom';
 import Graph from './GraphComponent';
@@ -13,10 +14,19 @@ class Dashboard extends Component{
             isVerified:false,
             productDocId: "",
             userDetails: {name: "", email: "", productId:"", address:""},
+            info1: {
+                labels:[],
+                datasets:[{
+                    label:"tv",
+                    backgroundColor: "rgba(255,0,255,0.75)",
+                    data:[]
+                }]
+            },
             //new
             house: '',
             equipment: '',
             data:[],
+           
            
         };
         this.updateProfile= this.updateProfile.bind(this);
@@ -78,7 +88,6 @@ class Dashboard extends Component{
                 }
                 else{
                     alert("Not a valid device");
-
                 }
             })
             .catch(error => console.log("Error"));     
@@ -94,6 +103,7 @@ class Dashboard extends Component{
 
     componentDidMount(){
         this.readUserData();
+        //this.readGraphDataRealTime();
     }
 
     //new
@@ -108,7 +118,7 @@ class Dashboard extends Component{
     handleSubmit(event) {
         //alert('The required house is: ' + this.state.house + " and the commponent is " + this.state.equipment);
         this.readDB(this.state.house, this.state.equipment);
-        this.state.data=[];
+        //this.state.data=[];
         event.preventDefault();
     }
 
@@ -118,24 +128,16 @@ class Dashboard extends Component{
         const renderResult=(data)=>{
             return(<div>{data}</div>)
         }        
-        //var houseDB = firestore.collection('readings').doc('houses').collection(house);
-        // houseDB.get()
-        // .then((snapshot)=>{
-        //     var XVal=1;
-        //     snapshot.docs.forEach(doc => {
-        //         const YVal=doc.data()[equipment]
-        //         this.state.data.push({x:XVal,y:YVal})
-        //         console.log(this.state.data)
-        //         XVal=XVal+1
-        //     })
-        //     ReactDOM.render(renderResult(<Graph data={this.state.data}></Graph>), document.getElementById('readings')); 
-        // })
         this.houseRef = firestore.collection('readings').doc('houses').collection(house).onSnapshot(
         (querySnapshot)=>{
             var XVal=1;
             querySnapshot.forEach(doc => {
                 const YVal=doc.data()[equipment]
-                this.state.data.push({x:XVal,y:YVal})
+                const arrayOfObject = this.state.data;
+                const check = obj => obj.x === XVal;
+                //console.log(arrayOfObject.some(checkUsername))
+                if(arrayOfObject.some(check) != true)
+                {this.state.data.push({x:XVal,y:YVal})}
                 console.log(this.state.data)
                 XVal=XVal+1
             })
@@ -167,23 +169,52 @@ class Dashboard extends Component{
                 // doc.data() will be undefined in this case
                 console.log("No such document!");
             }
+            this.readGraphDataRealTime();
         }).catch(function(error) {
             console.log("Error getting document:", error);
         });           
     }
 
     readGraphDataRealTime(){
-        var dataRef = firestore.collection("powerData");
-        dataRef.where("productId", "==", "EM10000")
-        .onSnapshot(function(querySnapshot) {
-            var data = [];
-            querySnapshot.forEach(function(doc) {
-                data.push(doc.data().timeFrameNo);
-                
-            });
-            return
-        console.log("Current cities in CA: ", data.join(", "));
-    });
+    // this.houseRef = firestore.collection('readings').doc('houses').collection("house1").onSnapshot(
+    //     (querySnapshot)=>{
+    //         var XVal=1;
+    //         this.state.info1.labels=[];
+    //         this.state.info1.datasets[0].data=[];
+    //         querySnapshot.forEach(doc => {
+    //             const YVal=doc.data().tv
+    //             const YVal1=doc.data().fridge
+    //             // if(this.state.info1.labels.includes(XVal.toString())!=true)
+    //             // {this.state.info1.labels.push(XVal.toString());
+    //             // this.state.info1.datasets[0].data.push(YVal);}
+    //             this.state.info1.labels.push(XVal.toString());
+    //             this.state.info1.datasets[0].data.push(YVal);
+    //             XVal=XVal+1
+    //         })
+    //         console.log(this.state.info1)
+    //         //console.log("still here")
+    //         ReactDOM.render(<Line options = {{responsive:true}}
+    //             data={this.state.info1}></Line>, document.getElementById('graphs')); 
+    //     })
+    var product = this.state.userDetails.productId;
+    this.houseRef = firestore.collection('powerData').where("productId","==", product).orderBy("timeFrameNo").onSnapshot(
+        (querySnapshot)=>{
+            var XVal=1;
+            this.state.info1.labels=[];
+            this.state.info1.datasets[0].data=[];
+            for (var i in querySnapshot.docs) {
+                const doc = querySnapshot.docs[i];
+                const YVal = doc.data().tv;
+                for (var j in YVal) {
+                    this.state.info1.labels.push(XVal.toString());
+                    this.state.info1.datasets[0].data.push(YVal[j]);
+                    XVal=XVal+1;
+            }                      
+            }
+            console.log(this.state.info1)
+            ReactDOM.render(<Line options = {{responsive:true}}
+                data={this.state.info1}></Line>, document.getElementById('graphs')); 
+        })
         
     }
 
@@ -277,6 +308,10 @@ class Dashboard extends Component{
                     </form>
                 </div>
                 <div id='readings'></div>
+                <div id='graphs' style={{position: "relative", width:600, height:550}}>
+                {/* <Line options = {{responsive:true}}
+                 data={this.state.info}></Line> */}
+                </div>
             </div>
         );
     }

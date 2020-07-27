@@ -1,5 +1,5 @@
 import * as ActionTypes from './ActionTypes';
-import { auth, firestore, fireauth, firebasestore } from '../firebase/firebase';
+import { auth, firestore } from '../firebase/firebase';
 
 
 export const productIdVerification = (product) => (dispatch) => {
@@ -75,8 +75,7 @@ export const signUpUser = (creds) => (dispatch) => {
         localStorage.setItem('user', JSON.stringify(user));
         dispatch(receiveSignUp(user));
 
-    }).
-    catch((err)=>{dispatch(signUpError())})
+    }).catch((err)=>{dispatch(signUpError())})
 }
 
 

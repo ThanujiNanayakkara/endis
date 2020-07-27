@@ -8,7 +8,7 @@ import Home from './HomeComponent';
 import Contact from './ContactComponent';
 import Dashboard from './DashboardComponent';
 
-import {Switch, Route, Redirect, withRouter} from 'react-router-dom';
+import {Switch, Route, Redirect, withRouter, Router} from 'react-router-dom';
 import { connect } from 'react-redux';
 import { signUpUser, loginUser, logoutUser, productIdVerification, resetSignUpForm, authStateChange} from '../redux/ActionCreators';
 
@@ -29,6 +29,7 @@ const mapDispatchToProps = (dispatch) => ({
       });
   
 
+
 class Main extends Component{
 
     componentDidMount(){
@@ -42,7 +43,7 @@ class Main extends Component{
     render(){
         const PrivateRoute = ({ component: Component, ...rest }) => (
             <Route {...rest} render={(props) => (
-              this.props.auth.isAuthenticated
+              this.props.auth.isAuthenticated 
                 ? <Component {...props} />
                 : <Redirect to={{
                     pathname: '/home',
@@ -61,12 +62,11 @@ class Main extends Component{
                     productIdVerification={this.props.productIdVerification}
                     resetSignUpForm={this.props.resetSignUpForm}/>
                  
-                    <Switch>
-                        <Route path = '/home' component ={ () => <Home/>} />
+                    <Switch >                     
+                        <Route exact path = '/home' component ={ () => <Home/>} />
                         <Route exact path = '/about' component ={ () => <About/>} />
                         <Route exact path = '/contact' component ={ () => <Contact/>} />
-                        <PrivateRoute exact path="/dashboard" component={() => <Dashboard />} />
-                        <Redirect to="/home"/>
+                        <PrivateRoute exact path="/dashboard" component={() => <Dashboard />} />                                               
                     </Switch>
                   
                 <Footer/>

@@ -1,5 +1,5 @@
 import * as ActionTypes from './ActionTypes';
-import { auth, firestore, fireauth, firebasestore } from '../firebase/firebase';
+//import { auth, firestore, fireauth } from '../firebase/firebase';
 
 // The auth reducer. The starting state sets authentication
 // based on a token being in local storage. In a real app,
