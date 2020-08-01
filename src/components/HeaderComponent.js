@@ -7,7 +7,6 @@ import {  firestore } from '../firebase/firebase';
 // // Required for side-effects
 // require("firebase/functions");
 
-
 class Header extends Component{
 
     constructor(props){
