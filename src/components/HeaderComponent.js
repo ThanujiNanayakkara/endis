@@ -109,157 +109,115 @@ class Header extends Component{
 
     render(){
         const PersonalData = ({ loggedIn}) => {
-            if (!loggedIn) return null;      
+            if (!loggedIn) return null;
             return (
                 <NavItem >
                 <NavLink className="nav-link" to="/dashboard">
                     <span className="fa fa-line-chart fa-lg"></span>Dashboard
                 </NavLink>
-                </NavItem>              
+                </NavItem>  
             );
-          };
+        };
 
         return(
-            <React.Fragment>
-                <Navbar light expand='md' fixed="top" color="white" >
-                    <div className = 'container'>
-                        <NavbarToggler onClick={this.toggleNav}/>
-                            <NavbarBrand className="mr-auto" href="/"> 
-                                <img src="assets/images/logo.png" height="80" width="80" alt="EnDis"></img>
-                            </NavbarBrand>
-                            <Collapse isOpen= {this.state.isNavOpen} navbar>
-                            <Nav navbar>                            
-                                    <NavItem >
-                                        <NavLink className="nav-link" to="/home">
-                                            <span className="fa fa-home fa-lg"></span>Home
-                                        </NavLink>
-                                    </NavItem>  
-                                    <NavItem>
-                                        <NavLink className="nav-link" to="/about">
-                                            <span className="fa fa-info fa-lg"></span>About Us
-                                        </NavLink>
-                                    </NavItem>
-                                    <NavItem>
-                                        <NavLink className="nav-link" to="/contact">
-                                            <span className="fa fa-address-card fa-lg"></span>Contact Us
-                                        </NavLink>
-                                    </NavItem>
-                                    <NavItem >
-                                    <NavLink className="nav-link" to="/dashboard">
-                                        <span className="fa fa-line-chart fa-lg"></span>Dashboard
-                                    </NavLink>
-                                    </NavItem>
-                                    {/* <PersonalData loggedIn={this.props.auth.isAuthenticated}/>  */}
-                                </Nav>
-                                <Nav className="ml-auto" navbar>
-                                    <NavItem>
-                                        { !this.props.auth.isAuthenticated ?
-                                            <div>
-                                            <Button outline onClick={this.toggleModalLogin} style={{marginRight:10}}>
-                                                <span className="fa fa-sign-in fa-lg"></span> Sign in
-                                                {this.props.auth.isFetching ?
-                                                    <span className="fa fa-spinner fa-pulse fa-fw"></span>
-                                                    : null
-                                                }
-                                            </Button>
-                                            <Button outline onClick={this.toggleModalSignUp}>
-                                            <span className="fa fa-user-plus fa-lg"></span> Sign up
-                                            {this.props.auth.isFetching ?
-                                                <span className="fa fa-spinner fa-pulse fa-fw"></span>
-                                                : null
-                                            }
-                                            </Button>
-                                            </div>
-                                            :
-                                            <div>
+                <React.Fragment>
+                    <Navbar className="header navbar-expand-lg navbar-dark" style={{zIndex:10}}>
+                            <div className = 'container' >
+                                <NavbarToggler onClick={this.toggleNav}/>
+                                    <NavbarBrand className="mr-auto" href="/home"    style={{position: 'absolute',  left: '40px'}}> 
+                                        <img src="assets/images/logo_white.png" height="80" width="80" alt="EnDis"></img>
+                                    </NavbarBrand>
+                                    <div style={{position: 'absolute',  right: '40px'}}>
+                                    <Collapse isOpen= {this.state.isNavOpen} navbar>
+                                        <Nav className="ml-auto" navbar>
+                                            <NavItem>
+                                                { !this.props.auth.isAuthenticated ?
+                                                    <div>
+                                                    <Button outline onClick={this.toggleModalLogin} style={{marginRight:10}}>
+                                                        <span className="fa fa-sign-in fa-lg"></span> Sign in
+                                                        {this.props.auth.isFetching ?
+                                                            <span className="fa fa-spinner fa-pulse fa-fw"></span>
+                                                            : null
+                                                        }
+                                                    </Button>
+                                                    <Button outline onClick={this.toggleModalSignUp}>
+                                                    <span className="fa fa-user-plus fa-lg"></span> Sign up
+                                                    {this.props.auth.isFetching ?
+                                                        <span className="fa fa-spinner fa-pulse fa-fw"></span>
+                                                        : null
+                                                    }
+                                                    </Button>
+                                                    </div>
+                                                    :
+                                                    <div>
+                                                    
+                                                    <Button outline onClick={this.handleLogout} style={{marginRight:10}}>
+                                                        <span className="fa fa-sign-out fa-lg"></span> Logout
+                                                        {this.props.auth.isFetching ?
+                                                            <span className="fa fa-spinner fa-pulse fa-fw"></span>
+                                                            : null
+                                                        }
+                                                    </Button>
+                                                    <Button outline>
+                                                        <NavLink className="nav-link" to="/dashboard">
+                                                            <span className="fa fa-line-chart fa-lg"></span> Dashboard
+                                                        </NavLink>
+                                                    </Button>
                                             
-                                            <Button outline onClick={this.handleLogout}>
-                                                <span className="fa fa-sign-out fa-lg"></span> Logout
-                                                {this.props.auth.isFetching ?
-                                                    <span className="fa fa-spinner fa-pulse fa-fw"></span>
-                                                    : null
+                                                    </div>
                                                 }
-                                            </Button>
-                                            </div>
-                                        }
-                                    </NavItem>
-                                    {/* <NavItem>
-                                        <Button outline onClick={this.toggleModal} style={{marginRight:10}}>
-                                            <span className="fa fa-sign-in fa-lg"></span> Sign in
-                                        </Button>
-                                    </NavItem>
-                                    <NavItem>
-                                        <Button outline onClick={this.toggleModalSignUp}>
-                                            <span className="fa fa-user-plus fa-lg"></span> Sign up
-                                        </Button>
-                                    </NavItem> */}
-                            </Nav>
-                             
-                            </Collapse>
-                    </div>
-                </Navbar>
-                <Jumbotron>
-                    <div className="container">
-                        <div className="row row-header">
-                            <div className="col-12 col-sm-12">
-                                {/* <h1>Ristorante Con Fusion</h1> */}                               
-                                {/* <h1 className="text-center font-italic">This is EnDis</h1> */}
-                                <p></p>
-                                <h4>Join with us to make better Energy Decisions</h4>
-                                <p></p>
-                                <p>We provide all necessary means for equipping your home to have all relevant energy related data always centrally available for monitoring as well as for basic data analysis. Energy related data can now always be available at the tip of your hands</p>
-                                {/* <p>We take inspiration from the World's best cuisines, and create a unique fusion experience. Our lipsmacking creations will tickle your culinary senses!</p>                             */}              
-                                <p>We Help You Save Energy, Time, Increase Savings and Improve Sustainability. Simply sign up to begin ....</p>        
-                            </div>                       
-                        </div>
-                    </div>
-                </Jumbotron>
-                <Modal isOpen = {this.state.isModalLoginOpen} toggle={this.toggleModalLogin}>
-                    <ModalHeader toggle={this.toggleModalLogin}>Login</ModalHeader>
-                    <ModalBody>
-                        <Form onSubmit={this.handleLogin}>
-                            <FormGroup>
-                                <Label htmlFor="username">Email</Label>
-                                <Input type="text" id="username" name="username"
-                                innerRef = {(input) => this.username = input} />       
-                            </FormGroup>
-                            <FormGroup>
-                                <Label htmlFor="password">Password</Label>
-                                <Input type="password" id="password" name="password" 
-                                innerRef = {(input) => this.password = input} />       
-                            </FormGroup>
-                            <FormGroup check>
-                                <Label check>
-                                    <Input type="checkbox" name="remember" 
-                                    innerRef = {(input) => this.remember = input} />
-                                    Remember me
-                                </Label>
-                            </FormGroup>
-                            <Button type="submit" value="submit" className="primary">Login</Button>
-                        </Form>
-                </ModalBody>
-                </Modal>
-                <Modal isOpen = {this.state.isModalSignUpOpen} toggle={this.toggleModalSignUp}>
-                    <ModalHeader toggle={this.toggleModalSignUp}>Sign Up</ModalHeader>
-                    <ModalBody>
-                        <Form onSubmit={this.handleSignUp}>
-                            <FormGroup>
-                                <Label htmlFor="username">Email</Label>
-                                <Input type="text" id="username" name="username" 
-                                innerRef = {(input) => this.username = input} />       
-                            </FormGroup>
-                            <FormGroup >
-                                <Label htmlFor="password">Password</Label>
-                                <Input type="password" id="password" name="password"  
-                                innerRef = {(input) => this.password = input} />       
-                            </FormGroup>
-                            <Button type="submit" value="submit" className="primary" >Sign Up</Button>
-                        </Form>
-                </ModalBody>
-                </Modal>
-                
-            </React.Fragment>
-            
+                                            </NavItem>
+                                    </Nav>
+                                    </Collapse>
+                                    </div>
+                               
+                            </div>
+                    </Navbar>
+
+                    <Modal isOpen = {this.state.isModalLoginOpen} toggle={this.toggleModalLogin}>
+                        <ModalHeader toggle={this.toggleModalLogin}>Login</ModalHeader>
+                        <ModalBody>
+                            <Form onSubmit={this.handleLogin}>
+                                <FormGroup>
+                                    <Label htmlFor="username">Email</Label>
+                                    <Input type="text" id="username" name="username"
+                                    innerRef = {(input) => this.username = input} />       
+                                </FormGroup>
+                                <FormGroup>
+                                    <Label htmlFor="password">Password</Label>
+                                    <Input type="password" id="password" name="password" 
+                                    innerRef = {(input) => this.password = input} />       
+                                </FormGroup>
+                                <FormGroup check>
+                                    <Label check>
+                                        <Input type="checkbox" name="remember" 
+                                        innerRef = {(input) => this.remember = input} />
+                                        Remember me
+                                    </Label>
+                                </FormGroup>
+                                <Button type="submit" value="submit" className="primary">Login</Button>
+                            </Form>
+                        </ModalBody>
+                    </Modal>
+                    <Modal isOpen = {this.state.isModalSignUpOpen} toggle={this.toggleModalSignUp}>
+                        <ModalHeader toggle={this.toggleModalSignUp}>Sign Up</ModalHeader>
+                        <ModalBody>
+                            <Form onSubmit={this.handleSignUp}>
+                                <FormGroup>
+                                    <Label htmlFor="username">Email</Label>
+                                    <Input type="text" id="username" name="username" 
+                                    innerRef = {(input) => this.username = input} />       
+                                </FormGroup>
+                                <FormGroup >
+                                    <Label htmlFor="password">Password</Label>
+                                    <Input type="password" id="password" name="password"  
+                                    innerRef = {(input) => this.password = input} />       
+                                </FormGroup>
+                                <Button type="submit" value="submit" className="primary" >Sign Up</Button>
+                            </Form>
+                        </ModalBody>
+                    </Modal>
+                </React.Fragment>
         );
     }
 }
@@ -267,4 +225,3 @@ class Header extends Component{
 
 
 export default Header;
-

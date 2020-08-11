@@ -4,13 +4,11 @@ import { auth, firestore } from '../firebase/firebase';
 import {Breadcrumb, BreadcrumbItem} from 'reactstrap';
 import {Link} from 'react-router-dom';
 import {Line, Bar} from 'react-chartjs-2';
-import Tabs from 'react-bootstrap/Tabs'
-import Tab from 'react-bootstrap/Tab'
-//new
+import Tabs from 'react-bootstrap/Tabs';
+import Tab from 'react-bootstrap/Tab';
 import ReactDOM from 'react-dom';
 import Graph from './GraphComponent';
-
-
+import Footer from './FooterComponent';
 
 class Dashboard extends Component{
     constructor(props){
@@ -24,38 +22,43 @@ class Dashboard extends Component{
                 labels:[],
                 datasets:[{
                     label:"tv",
-                    backgroundColor: "rgba(255,0,255,0.75)",
+                    backgroundColor: "rgba(0, 0, 130, 0.3)",
+                    pointBackgroundColor: "rgb(0, 0, 130)",
+                    borderColor:"rgba(0, 0, 130)",
                     data:[]
                 }]
-            },{
+                },{
                 labels:[],
                 datasets:[{
                     label:"fridge",
-                    backgroundColor: "rgba(0,255,255,0.75)",
+                    backgroundColor: "rgba(0, 130, 0, 0.3)",
+                    pointBackgroundColor: "rgb(0, 130, 0)",
+                    borderColor:"rgba(0, 130, 0)",
+                    data:[]
+                }]
+                },{
+                labels:[],
+                datasets:[{
+                    label:"washing machine",
+                    backgroundColor: "rgba(130, 0, 0, 0.3)",
+                    pointBackgroundColor: "rgb(130, 0, 0)",
+                    borderColor:"rgba(130, 0, 0)",
                     data:[]
                 }]
                 },
-                {
-                    labels:[],
-                    datasets:[{
-                        label:"washing machine",
-                        backgroundColor: "rgba(255,255,0,0.75)",
-                        data:[]
-                    }]
-                    },
                 ],
             barInfo: [{
                     labels:[],
                     datasets:[{
                         label:"tv",
-                        backgroundColor: "rgba(255,0,255,0.75)",
+                        backgroundColor: "#fac802",
                         data:[]
                     }]
                 },{
                     labels:[],
                     datasets:[{
                         label:"fridge",
-                        backgroundColor: "rgba(0,255,255,0.75)",
+                        backgroundColor: "#fcd22b",
                         data:[]
                     }]
                     },
@@ -63,7 +66,7 @@ class Dashboard extends Component{
                         labels:[],
                         datasets:[{
                             label:"washing machine",
-                            backgroundColor: "rgba(255,255,0,0.75)",
+                            backgroundColor: "#fcd94c",
                             data:[]
                         }]
                         },
@@ -173,31 +176,11 @@ class Dashboard extends Component{
 
     //new
     readDB=(house,equipment)=>{
-
-        const renderResult=(data)=>{
-            return(<div>{data}</div>)
-        }        
-        this.houseRef = firestore.collection('readings').doc('houses').collection(house).onSnapshot(
-        (querySnapshot)=>{
-            var XVal=1;
-            querySnapshot.forEach(doc => {
-                const YVal=doc.data()[equipment]
-                const arrayOfObject = this.state.data;
-                const check = obj => obj.x === XVal;
-                //console.log(arrayOfObject.some(checkUsername))
-                if(arrayOfObject.some(check) != true)
-                {this.state.data.push({x:XVal,y:YVal})}
-                console.log(this.state.data)
-                XVal=XVal+1
-            })
-            //console.log("still here")
-            ReactDOM.render(renderResult(<Graph data={this.state.data}></Graph>), document.getElementById('readings')); 
-        })
-        // var today = new Date();
-        // var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
-        // firestore.collection("readings").add({
-        //     time: new Date(Date.now())
-        // })       
+    var today = new Date();
+        var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
+        firestore.collection("readings").add({
+            time: new Date(Date.now())
+        })       
     }
 
     componentWillUnmount(){
@@ -279,8 +262,10 @@ class Dashboard extends Component{
             }                      
             }
             //console.log(this.state.info[device])
-            ReactDOM.render(<Line options = {{responsive:true}}
+            ReactDOM.render(<Line 
+                options = {{responsive:true, style:{backgroundColor:"#000000"} }}
                 data={this.state.info[device]}></Line>, document.getElementById('graphs'+device)); 
+                
         }
         })   
     }
@@ -358,28 +343,21 @@ class Dashboard extends Component{
 
     render(){     
         return(
-            <div>
-                <div className="container mt-4">
-                <div className="row">
-                    <Breadcrumb>
-                        <BreadcrumbItem><Link to= '/home'>Home</Link ></BreadcrumbItem>
-                        <BreadcrumbItem active>Dashboard</BreadcrumbItem>
-                    </Breadcrumb>  
-                </div>
-                    <div className="row align-items-start">
-                        <div className="col-12 col-md-3 mr-5">                            
-                                <Card style={{backgroundColor:"#778899"}}>
+
+                <div className="dashboard">
+                    <div className="row">
+                        <div className="col-12 col-md-2 mr-5" style={{width:"100%", height:"100%"}}> 
+                            <Card style={{backgroundColor:"#222222", color:'#ffffff'}}>
                                 <CardBody className="text-center">
-                                    <CardImg src="assets/images/person.png" alt="" className="img-fluid rounded-circle mb-3" width="20"/>  
-                                    <CardTitle className="text-center" >User Profile</CardTitle> 
-                                    <ListGroup variant="flush" style={{fontSize:15}}>
-                                        <ListGroupItem >Name: {this.state.userDetails.name}</ListGroupItem>
+                                    <CardImg src="assets/images/ppic.png" alt="" className="img-fluid mb-3"/>  
+                                    <CardTitle className="text-center" >{this.state.userDetails.name}</CardTitle> 
+                                    <ListGroup variant="flush" style={{fontSize:15, color:'#000000'}}>
                                         <ListGroupItem>Email: {auth.currentUser.email}</ListGroupItem>
                                         <ListGroupItem>Product Id: {this.state.userDetails.productId}</ListGroupItem>
                                         <ListGroupItem>Address: {this.state.userDetails.address}</ListGroupItem>
-                                    </ListGroup>
-                                    <Button color="warning"  className="mt-2" onClick={this.toggleModalUpdate}>
-                                     Edit Bio
+                                     </ListGroup>
+                                    <Button color="warning" className="mt-2" onClick={this.toggleModalUpdate}>
+                                     Change bio
                                     </Button>
                                 </CardBody>
                                 <Modal isOpen = {this.state.isUpdateOpen} toggle={this.toggleModalUpdate}>
@@ -422,145 +400,91 @@ class Dashboard extends Component{
                                     }
                                 </ModalBody>
                                 </Modal>
-                                
                             </Card>
                         </div>
-                        <div className="col-12 col-md-8 col align-self-start">
-                            <Tabs defaultActiveKey="now" id="uncontrolled-tab-example">
-                                <Tab eventKey="now" title="Now">
+                        <div className="col-12 col-md-9 align-self-start">
+                            <Tabs defaultActiveKey="now" id="uncontrolled-tab-example" className="tab-topic">
+                                <Tab eventKey="now" title="Now" className="tab-item">
                                     <div id="notify">
                                     </div>
-                                    <div id='graphs0' style={{position: "relative"}}>
+                                
+                                    <div className="row equip-choose">
+                                    <div class="form-check col-4">
+                                        <input type="checkbox" class="form-check-input" id="showWashingMachine"></input>
+                                        <label class="form-check-label" for="showWashingMachine">Washing machine</label>
                                     </div>
-                                    <div id='graphs1' style={{position: "relative"}}>
+                                    <div class="form-check col-4">
+                                        <input type="checkbox" class="form-check-input" id="showTV"></input>
+                                        <label class="form-check-label" for="showTV">TV</label>
                                     </div>
-                                    <div id='graphs2' style={{position: "relative"}}>
+                                    <div class="form-check col-4">
+                                        <input type="checkbox" class="form-check-input" id="showFridge"></input>
+                                        <label class="form-check-label" for="showFridge">Fridge</label>
                                     </div>
+                                    </div>
+                            
+                                    <br></br><br></br>
+                                    
+                                    <div className="row">
+                                    <div className="col-12 col-md-2"></div>
+                                    <div className="col-12 col-md-7" id='graphs0' style={{position: "relative", backgroundColor:"#ffffff", borderRadius:"10px"}}>
+                                    </div>
+                                    </div>
+                                    
+                                    <br></br><br></br>
+                                    
+                                    <div className="row">
+                                    <div className="col-12 col-md-3"></div>
+                                    <div className="col-12 col-md-7" id='graphs1' style={{position: "relative", backgroundColor:"#ffffff", borderRadius:"10px"}}>
+                                    </div>
+                                    </div>
+                                    
+                                    <br></br><br></br>
+                                    
+                                    <div className="row">
+                                    <div className="col-12 col-md-2"></div>
+                                    <div className="col-12 col-md-7" id='graphs2' style={{position: "relative", backgroundColor:"#ffffff", borderRadius:"10px"}}>
+                                    </div>
+                                    </div>
+                                
+                                    <br></br><br></br>
                                 </Tab>
                                 <Tab eventKey="daily" title="Daily">
                                     <div id="notifyD">
                                     </div>
-                                    <div id='bars0' style={{position: "relative"}}>
+                                    <br></br><br></br>
+                                    
+                                    <div className="row">
+                                    <div className="col-12 col-md-1"></div>
+                                    <div className="col-12 col-md-8" id='bars0' style={{position: "relative", backgroundColor:"#ffffff", borderRadius:"10px"}}>
                                     </div>
-                                    <div id='bars1' style={{position: "relative"}}>
                                     </div>
-                                    <div id='bars2' style={{position: "relative"}}>
+                                    
+                                    <br></br><br></br>
+                                    
+                                    <div className="row">
+                                    <div className="col-12 col-md-3"></div>
+                                    <div className="col-12 col-md-8" id='bars1' style={{position: "relative", backgroundColor:"#ffffff", borderRadius:"10px"}}>
                                     </div>
+                                    </div>
+                                    
+                                    <br></br><br></br>
+                                    
+                                    <div className="row">
+                                    <div className="col-12 col-md-1"></div>
+                                    <div className="col-12 col-md-8" id='bars2' style={{position: "relative", backgroundColor:"#ffffff", borderRadius:"10px"}}>
+                                    </div>
+                                    </div>
+                                
                                 </Tab>
-                                <Tab eventKey="monthly" title="Monthly" >
-                                <Card>
-                                    <CardBody>
-                                        <CardTitle className="text-center">
-                                            Still Working On..
-                                        </CardTitle>
-                                    </CardBody>
-                                </Card>
+                                <Tab eventKey="monthly" title="Monthly" disabled>
                                 </Tab>
                             </Tabs>
-                           
-                        </div>
-                            
-                    </div>
-                    <div className="row align-items-start">
-                        <div className="col-12 col-md m-1">
-                            
-                        </div>
-                        <div className="col-12 col-md m-1">
-                            
                         </div>
                     </div>
                 </div>
-            
-                {/* new */}
-                .
-                {/* <h1>Dashboard</h1> */}
-                <h3>Readings</h3>
-                <div>
-                    <form onSubmit={this.handleSubmit}>
-                        <label>
-                            Name:
-                            <input type="text" name='house' house={this.state.house} onChange={this.handleChange} />
-                        </label>
-                        <label>
-                            Equipment:
-                            <input type="text" name='equipment' equipment={this.state.equipment} onChange={this.handleChange} />
-                        </label>
-                        <input type="submit" value="Submit" />
-                    </form>
-                </div>
-                <div id='readings'></div>
-                
-            </div>
         );
     }
 }
 
 export default Dashboard;
-
-// var product = this.state.userDetails.productId;
-// var deviceTypes=["tv","fridge"];
-// this.houseRef = firestore.collection('powerData').where("productId","==", product).orderBy("timeFrameNo").onSnapshot(
-//     (querySnapshot)=>{
-//         for (var device in deviceTypes)
-//         {var XVal=1;
-//         this.state.info1.labels=[];
-//         this.state.info1.datasets[0].data=[];
-//         for (var i in querySnapshot.docs) {
-//             const doc = querySnapshot.docs[i];
-//             const YVal = doc.data().tv;
-//             for (var j in YVal) {
-//                 this.state.info1.labels.push(XVal.toString());
-//                 this.state.info1.datasets[0].data.push(YVal[j]);
-//                 XVal=XVal+1;
-//         }                      
-//         }
-//         console.log(this.state.info1)
-//         ReactDOM.render(<Line options = {{responsive:true}}
-//             data={this.state.info1}></Line>, document.getElementById('graphs')); }
-//     })
-
-// this.houseRef = firestore.collection('readings').doc('houses').collection("house1").onSnapshot(
-    //     (querySnapshot)=>{
-    //         var XVal=1;
-    //         this.state.info1.labels=[];
-    //         this.state.info1.datasets[0].data=[];
-    //         querySnapshot.forEach(doc => {
-    //             const YVal=doc.data().tv
-    //             const YVal1=doc.data().fridge
-    //             // if(this.state.info1.labels.includes(XVal.toString())!=true)
-    //             // {this.state.info1.labels.push(XVal.toString());
-    //             // this.state.info1.datasets[0].data.push(YVal);}
-    //             this.state.info1.labels.push(XVal.toString());
-    //             this.state.info1.datasets[0].data.push(YVal);
-    //             XVal=XVal+1
-    //         })
-    //         console.log(this.state.info1)
-    //         //console.log("still here")
-    //         ReactDOM.render(<Line options = {{responsive:true}}
-    //             data={this.state.info1}></Line>, document.getElementById('graphs')); 
-    //     })
-
-       // this.state.barInfo[product].labels=[];
-                // this.state.barInfo[product].datasets[0].data=[];
-                // var X=1;
-                // for (var j in docSnapshots.docs) {
-                //     const doc = docSnapshots.docs[j];
-                //     const Y = doc.data().data;
-                //     for ( var pro in Y){
-                //         if ((Y[pro][productI])!== undefined){
-                //             for (var product in productTypes){
-                //                 var YData = Y[pro][productI][productTypes[product]]
-                //                 this.state.barInfo[product].labels.push(X.toString());
-                //                 this.state.barInfo[product].datasets[0].data.push(YData);
-                //             }
-                //             break;                 
-                //         }
-                //     }
-                //     X=X+1;                                   
-                // }
-                // ReactDOM.render(<Bar options = {{responsive:true}}
-                //     data={this.state.barInfo[0]}></Bar>, document.getElementById('bars'+0)); 
-                //     ReactDOM.render(<Bar options = {{responsive:true}}
-                //         data={this.state.barInfo[1]}></Bar>, document.getElementById('bars'+1));
-                //         ReactDOM.render(<Bar options = {{responsive:true}}
-                //             data={this.state.barInfo[2]}></Bar>, document.getElementById('bars'+2));
