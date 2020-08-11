@@ -65,8 +65,9 @@ class Main extends Component{
                     <Switch >                     
                         <Route exact path = '/home' component ={ () => <Home/>} />
                         <Route exact path = '/about' component ={ () => <About/>} />
-                        <Route exact path = '/contact' component ={ () => <Contact/>} />
-                        <PrivateRoute exact path="/dashboard" component={() => <Dashboard />} />                                               
+                        <Route exact path = '/contact' component ={ () => <Contact/>}/>
+                        <PrivateRoute exact path='/dashboard' component={ () => <Dashboard/>}/>
+                        <Route path = '/'  component ={ () => <Home/>} />                                               
                     </Switch>
                   
                 <Footer/>
