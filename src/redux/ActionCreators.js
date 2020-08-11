@@ -75,7 +75,10 @@ export const signUpUser = (creds) => (dispatch) => {
         localStorage.setItem('user', JSON.stringify(user));
         dispatch(receiveSignUp(user));
 
-    }).catch((err)=>{dispatch(signUpError())})
+    }).catch((err)=>{
+        dispatch(signUpError());
+        alert(err.message);
+                })
 }
 
 
@@ -131,7 +134,10 @@ export const loginUser = (creds) => (dispatch) => {
         // Dispatch the success action
         dispatch(receiveLogin(user));
     })
-    .catch(error => dispatch(loginError(error.message)))
+    .catch(error => {
+        dispatch(loginError(error.message));
+        alert(error.message);
+    })
 };
 
 export const requestLogout = () => {

@@ -1,6 +1,8 @@
 import React, {Component} from 'react';
 import { Card, CardImg, CardText, CardBody, CardTitle, CardSubtitle, Button,  Modal, ModalHeader, ModalBody, Form, FormGroup, Input, Label, ListGroup, ListGroupItem } from 'reactstrap';
 import { auth, firestore } from '../firebase/firebase';
+import {Breadcrumb, BreadcrumbItem} from 'reactstrap';
+import {Link} from 'react-router-dom';
 import {Line, Bar} from 'react-chartjs-2';
 import Tabs from 'react-bootstrap/Tabs'
 import Tab from 'react-bootstrap/Tab'
@@ -81,7 +83,7 @@ class Dashboard extends Component{
         this.handleSubmit = this.handleSubmit.bind(this);
 
     }
-
+//this function runs when edit bio button is clicked
     updateProfile(event){
         event.preventDefault();
         this.toggleModalUpdate();
@@ -105,7 +107,7 @@ class Dashboard extends Component{
         }
        
     }
-
+//this function handles the verification of the product id
     handleVerify(){
         var productsRef = firestore.collection("issuedProducts");
          productsRef.where("productId", "==", this.productid.value).where("active", "==", false)
@@ -172,30 +174,30 @@ class Dashboard extends Component{
     //new
     readDB=(house,equipment)=>{
 
-        // const renderResult=(data)=>{
-        //     return(<div>{data}</div>)
-        // }        
-        // this.houseRef = firestore.collection('readings').doc('houses').collection(house).onSnapshot(
-        // (querySnapshot)=>{
-        //     var XVal=1;
-        //     querySnapshot.forEach(doc => {
-        //         const YVal=doc.data()[equipment]
-        //         const arrayOfObject = this.state.data;
-        //         const check = obj => obj.x === XVal;
-        //         //console.log(arrayOfObject.some(checkUsername))
-        //         if(arrayOfObject.some(check) != true)
-        //         {this.state.data.push({x:XVal,y:YVal})}
-        //         console.log(this.state.data)
-        //         XVal=XVal+1
-        //     })
-        //     //console.log("still here")
-        //     ReactDOM.render(renderResult(<Graph data={this.state.data}></Graph>), document.getElementById('readings')); 
-        // })
-        var today = new Date();
-        var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
-        firestore.collection("readings").add({
-            time: new Date(Date.now())
-        })       
+        const renderResult=(data)=>{
+            return(<div>{data}</div>)
+        }        
+        this.houseRef = firestore.collection('readings').doc('houses').collection(house).onSnapshot(
+        (querySnapshot)=>{
+            var XVal=1;
+            querySnapshot.forEach(doc => {
+                const YVal=doc.data()[equipment]
+                const arrayOfObject = this.state.data;
+                const check = obj => obj.x === XVal;
+                //console.log(arrayOfObject.some(checkUsername))
+                if(arrayOfObject.some(check) != true)
+                {this.state.data.push({x:XVal,y:YVal})}
+                console.log(this.state.data)
+                XVal=XVal+1
+            })
+            //console.log("still here")
+            ReactDOM.render(renderResult(<Graph data={this.state.data}></Graph>), document.getElementById('readings')); 
+        })
+        // var today = new Date();
+        // var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
+        // firestore.collection("readings").add({
+        //     time: new Date(Date.now())
+        // })       
     }
 
     componentWillUnmount(){
@@ -203,20 +205,22 @@ class Dashboard extends Component{
             this.houseRef();
         }
     }    
-
+//this function runs each time component get mounted in order to read the user data
     readUserData(){
         let user= auth.currentUser;
         var usersRef = firestore.collection("userDetails").doc(user.uid);
         usersRef.get()
         .then(doc => {
             if (doc.exists) {
-                console.log("Document data:", doc.data().name);
+                //console.log("Document data:", doc.data().name);
                 this.setState({
                     userDetails: doc.data(),
                 });
                 this.informUser(doc.data().productId);
-                if(doc.data().productId!=""){
-                    this.readGraphDataRealTime();
+                if(doc.data().productId!==""){
+                    this.readDeviceByDevice("tv",0);
+                    this.readDeviceByDevice("fridge",1);
+                    //this.readGraphDataRealTime();
                     this.readDailyDataForMonth();
                 }                
             } else {
@@ -231,7 +235,7 @@ class Dashboard extends Component{
     informUser(condition){
         ReactDOM.render(
             <div>
-            {condition != "" ? null :
+            {condition !== "" ? null :
             <Card>
                 <CardBody>
                     <CardTitle className="text-center">
@@ -243,7 +247,7 @@ class Dashboard extends Component{
             </div>, document.getElementById('notify'));
         ReactDOM.render(
             <div>
-            {condition != "" ? null :
+            {condition !== "" ? null :
             <Card>
                 <CardBody>
                     <CardTitle className="text-center">
@@ -254,6 +258,7 @@ class Dashboard extends Component{
             }
             </div>, document.getElementById('notifyD')); 
     }
+
 
     readGraphDataRealTime(){
     var product = this.state.userDetails.productId;
@@ -278,6 +283,29 @@ class Dashboard extends Component{
                 data={this.state.info[device]}></Line>, document.getElementById('graphs'+device)); 
         }
         })   
+    }
+
+    readDeviceByDevice(device,num){
+        var product = this.state.userDetails.productId;
+        this.houseRef = firestore.collection('powerDataTest').where("device", "==", device).where("productId","==", product).orderBy("timeFrameNo").onSnapshot(
+            (querySnapshot)=>{
+                var XVal=1;
+                this.state.info[num].labels=[];
+                this.state.info[num].datasets[0].data=[];
+                for (var i in querySnapshot.docs) {
+                    const doc = querySnapshot.docs[i];
+                    const YVal = doc.data()[device];
+                    for (var j in YVal) {
+                        this.state.info[num].labels.push(XVal.toString());
+                        this.state.info[num].datasets[0].data.push(YVal[j]);
+                        XVal=XVal+1;
+                }                      
+                }
+                //console.log(this.state.info[device])
+                ReactDOM.render(<Line options = {{responsive:true}}
+                    data={this.state.info[num]}></Line>, document.getElementById('graphs'+ num)); 
+            
+            }) 
     }
 
     readDailyDataForMonth(){
@@ -312,10 +340,9 @@ class Dashboard extends Component{
                             X=X+1;
                             break;                     
                         }
-                    }                    
-                    
+                    }                                       
                 }
-                console.log(this.state.barInfo[product])
+                //console.log(this.state.barInfo[product])
                 ReactDOM.render(<Bar options= {
                     {scales: {
                         yAxes: [{
@@ -333,6 +360,12 @@ class Dashboard extends Component{
         return(
             <div>
                 <div className="container mt-4">
+                <div className="row">
+                    <Breadcrumb>
+                        <BreadcrumbItem><Link to= '/home'>Home</Link ></BreadcrumbItem>
+                        <BreadcrumbItem active>Dashboard</BreadcrumbItem>
+                    </Breadcrumb>  
+                </div>
                     <div className="row align-items-start">
                         <div className="col-12 col-md-3 mr-5">                            
                                 <Card style={{backgroundColor:"#778899"}}>
@@ -414,11 +447,11 @@ class Dashboard extends Component{
                                     <div id='bars2' style={{position: "relative"}}>
                                     </div>
                                 </Tab>
-                                <Tab eventKey="monthly" title="Monthly" disabled>
+                                <Tab eventKey="monthly" title="Monthly" >
                                 <Card>
                                     <CardBody>
                                         <CardTitle className="text-center">
-                                            Hello
+                                            Still Working On..
                                         </CardTitle>
                                     </CardBody>
                                 </Card>

@@ -1,6 +1,10 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 const moment = require("moment");
+const tf = require("@tensorflow/tfjs");
+const { google } = require('googleapis');
+const ml = google.ml('v1');
+
 admin.initializeApp();
 
 // // Create and Deploy Your First Cloud Functions
@@ -10,6 +14,108 @@ admin.initializeApp();
 //  response.send("Hello from Firebase!");
 // });
 // The Cloud Functions for Firebase SDK to create Cloud Functions and setup triggers.
+
+exports.getPrediction = functions.https.onRequest((req, res) => {
+
+    google.auth.getApplicationDefault( (err, authClient, projectId) => {
+
+        res.header('Content-Type','application/json');
+        res.header('Access-Control-Allow-Origin', 'https://storage.googleapis.com');
+        res.header('Access-Control-Allow-Headers', 'Content-Type');
+
+        //respond to CORS preflight requests
+        if (req.method === 'OPTIONS') {
+            res.status(204).send('');
+            return;
+        }
+
+        if (err) {
+
+            console.log('Authentication failed because of ', err);
+            res.status(401).send('Authentication failed');
+          
+        } else {
+          
+           // create the full model name which includes the project ID
+           const modelName = 'projects/' + projectId + '/models/' + req.body.model;
+          
+            const mleRequestJson = {
+                'auth': authClient,
+                'name': modelName,
+                'resource': {'instances' : req.body.instances}
+            }
+
+            ml.projects.predict(mleRequestJson)
+            .then(result => {
+                const q = admin.firestore().collection("testData").add({
+                    predictions: result.data.predictions[0].dense_2
+                })
+                res.send("OK")
+                return q
+
+            })
+            .catch(err=>{
+                console.log(err);
+                res.status(400).send('Something broke, does that model exist?');
+            })
+          }
+    });
+});
+
+exports.getPredictionAll = functions.https.onRequest((req, res) => {
+
+    google.auth.getApplicationDefault( (err, authClient, projectId) => {
+
+        res.header('Content-Type','application/json');
+        res.header('Access-Control-Allow-Origin', 'https://storage.googleapis.com');
+        res.header('Access-Control-Allow-Headers', 'Content-Type');
+
+        //respond to CORS preflight requests
+        if (req.method === 'OPTIONS') {
+            res.status(204).send('');
+            return;
+        }
+
+        if (err) {
+
+            console.log('Authentication failed because of ', err);
+            res.status(401).send('Authentication failed');
+          
+        } else {          
+           // create the full model name which includes the project ID
+           var modelRequests=[]
+           for (var i ; i< req.body.devices; i++){
+            const modelName = 'projects/' + projectId + '/models/' + req.body.model;
+            const mleRequestJson = {
+                'auth': authClient,
+                'name': modelName,
+                'resource': {'instances' : req.body.instances[i]}
+            }
+            modelRequests.push(mleRequestJson);
+           }
+           var promises =[]
+           for (var request in modelRequests){
+               const p = ml.projects.predict(modelRequests[request])
+               promises.push(p)
+           }
+           return Promise.all(promises)
+            .then(result => {
+                const q = admin.firestore().collection("testData").add({
+                    tv: result[0].data.predictions[0].dense_2,
+                    fridge: result[1].data.predictions[0].dense_2,
+                    washingmachine: result[2].data.predictions[0].dense_2,
+                })
+                res.send("OK")
+                return q
+
+            })
+            .catch(err=>{
+                console.log(err);
+                res.status(400).send('Something broke, does that model exist?');
+            })
+          }
+    });
+});
  
 
 exports.userJoined= functions.auth.user()
@@ -30,7 +136,66 @@ exports.userDeleted= functions.auth.user()
         return doc.delete();
 
 });
-exports.onSchedule = functions.https.onRequest((req, res) => {   
+
+exports.onScheduleD = functions.https.onRequest((req, res) => {   
+    admin.firestore().collection("issuedProducts").where("active","==", true).get()
+    .then(querySnapshot => {
+        var productsList=[];
+        querySnapshot.forEach(doc => {
+            // doc.data() is never undefined for query doc snapshots
+            productsList.push(doc.data().productId)
+        });
+        const promises = []
+        var beginningDate = Date.now() - 86400000 ;
+        var beginningDateObject = new Date(beginningDate);
+        var endObject = new Date(Date.now())
+        for (product in productsList){
+            const p = admin.firestore().collection("powerDataTest").where("productId","==", productsList[product])
+                .where("timeFrameNo",">", beginningDateObject)
+                .where("timeFrameNo", "<=", endObject)
+                .get()
+            promises.push(p)
+        }        
+        return Promise.all(promises)
+    }) 
+        .then(docSnapshots =>{
+            const powerSum=[]
+            const deviceTypes = ["tv","fridge","washing machine"]
+            docSnapshots.forEach(docSnapshot => {
+                var sum=[0,0,0]
+                var productName = "None"
+                docSnapshot.forEach(doc => {
+                    //console.log(doc.data().device)
+                    for (var device in deviceTypes){
+                        if(doc.data().device === deviceTypes[device]){
+                            const docdata = doc.data()[deviceTypes[device]]
+                            for (i in docdata){
+                                sum[device]+= docdata[i]
+                            }
+                        } 
+                    }
+                    productName = doc.data().productId
+                })
+                powerSum.push({[productName]: {tv: sum[0],fridge: sum[1], washingmachine:sum[2]}})
+                //console.log(powerSum)
+            })
+            var dateO = new Date(Date.now() - 86400000)
+            const q = admin.firestore().collection("dailyPowerReadings").add({
+                data: powerSum,
+                timeStamp: dateO
+            })
+            res.send("OK")
+            return q
+        })
+        .catch((error)=>{
+            console.log("error")
+            res.status(500).send(error)
+    })        
+  })
+
+  exports.scheduledFunctionCrontab = functions.pubsub.schedule('00 00 * * *')
+  .timeZone('Asia/Colombo') // Users can choose timezone - default is America/Los_Angeles
+  .onRun((context) => {
     admin.firestore().collection("issuedProducts").where("active","==", true).get()
     .then(querySnapshot => {
         var productsList=[];
@@ -74,12 +239,133 @@ exports.onSchedule = functions.https.onRequest((req, res) => {
                 data: powerSum,
                 timeStamp: dateO
             })
-            res.send(q)
+            //res.send(q)
             return q
         })
         .catch((error)=>{
             console.log("error")
             res.status(500).send(error)
     })        
-  })
+});
 
+exports.scheduledFunctionCrontabD = functions.pubsub.schedule('00 00 * * *')
+  .timeZone('Asia/Colombo') // Users can choose timezone - default is America/Los_Angeles
+  .onRun((context) => {
+    admin.firestore().collection("issuedProducts").where("active","==", true).get()
+    .then(querySnapshot => {
+        var productsList=[];
+        querySnapshot.forEach(doc => {
+            // doc.data() is never undefined for query doc snapshots
+            productsList.push(doc.data().productId)
+        });
+        const promises = []
+        var beginningDate = Date.now() - 345600000 ;
+        var beginningDateObject = new Date(beginningDate);
+        var endObject = new Date(Date.now() - 259200000)
+        for (product in productsList){
+            const p = admin.firestore().collection("powerData").where("productId","==", productsList[product])
+                .where("timeFrameNo",">", beginningDateObject)
+                .where("timeFrameNo", "<=", endObject)
+                .get()
+            promises.push(p)
+        }        
+        return Promise.all(promises)
+    }) 
+        .then(docSnapshots =>{
+            const powerSum=[]
+            const deviceTypes = ["tv","fridge","washing machine"]
+            docSnapshots.forEach(docSnapshot => {
+                var sum=[0,0,0]
+                var productName = "None"
+                docSnapshot.forEach(doc => {
+                    for (device in deviceTypes){
+                        if(doc.data().device === deviceTypes[device]){
+                            const docdata = doc.data()[deviceTypes[device]]
+                            for (i in docdata){
+                                sum[device]+= docdata[i]
+                            }
+                            break;
+                        }                        
+                    }
+                    productName = doc.data().productId
+                })
+                powerSum.push({[productName]: {tv: sum[0],fridge: sum[1], washingmachine:sum[2]}})
+            })
+            var dateO = new Date(Date.now() - 86400000)
+            //var date = dateO.toDateString()
+            const q = admin.firestore().collection("dailyPowerReadings").add({
+                data: powerSum,
+                timeStamp: dateO
+            })
+            //res.send(q)
+            return q
+        })
+        .catch((error)=>{
+            console.log("error")
+            res.status(500).send(error)
+    })        
+});
+
+
+exports.predict = functions.https.onRequest((req, res) => {
+    // var b = new Array(1000).fill(1)
+    let data = req.body.samples; 
+    var input = tf.tensor(data,shape=[1,1000,1],dtype="float32");
+    //var input = tf.ones([1,1000,1])
+    predict(input)
+    .then((pred) => {
+        let user = req.body.user;
+        var date = new Date(Date.now())
+        const q = admin.firestore().collection("powerDataTest").add({
+            tv: Array.from(pred),
+            timeFrameNo: date,
+            productId: user
+        })
+        res.status(200).send("OK");
+        return(q);
+    })
+    .catch((error)=>{
+        console.log("error")
+        res.status(500).send(error)
+    });
+  });
+
+  exports.predictAll = functions.https.onRequest((req, res) => {
+    var data = [req.body.tvSamples, req.body.fridgeSamples];
+    var shapeAr = [1000,1000]
+    var promises = []
+    for (var i in shapeAr){
+        var input = tf.tensor(data[i],shape=[1,shapeAr[i],1],dtype="float32");
+        const p = predict(input)
+        promises.push(p)
+    }
+    Promise.all(promises)
+    .then((preds) => {
+        let user = req.body.user;
+        var date = new Date(Date.now())
+        const q = admin.firestore().collection("powerDataTest").add({
+            tv: Array.from(preds[0]),
+            fridge: Array.from(preds[1]),
+            timeFrameNo: date,
+            productId: user
+        })
+        res.status(200).send("OK");
+        return(q);
+    })
+    .catch((error)=>{
+        console.log("Error")
+        res.status(500).send(error)
+    });
+  });
+  
+  async function predict(data) {
+   let model = await tf.loadLayersModel(
+      "https://firebasestorage.googleapis.com/v0/b/elecmoni.appspot.com/o/model.json?alt=media&token=40f180a1-432a-4eb0-9a3d-0254f0ff6825"
+    );
+    //let input = tf.tensor3d(data);
+    //console.log(input)
+    
+    //input = input.expandDims(0);
+    return model.predict(data).dataSync();
+  }
+ 

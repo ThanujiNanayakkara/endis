@@ -8,7 +8,7 @@ import Home from './HomeComponent';
 import Contact from './ContactComponent';
 import Dashboard from './DashboardComponent';
 
-import {Switch, Route, Redirect, withRouter, Router} from 'react-router-dom';
+import {Switch, Route, Redirect, withRouter} from 'react-router-dom';
 import { connect } from 'react-redux';
 import { signUpUser, loginUser, logoutUser, productIdVerification, resetSignUpForm, authStateChange} from '../redux/ActionCreators';
 

@@ -14,7 +14,8 @@
   /* background-color: #D1C4E9; */
   font-family: 'Times New Roman', Times, serif;
   font-size: 1.25em;
-  background-color: #FFE277;
+  /* background-color: #FFE277; */
+  background-color: #FFCB74;
   margin:0px auto;
   padding: 20px 0px 20px 0px;
 }
@@ -25,7 +26,8 @@
   padding:110px 10px 10px 10px;
   margin:0px auto;
   /* margin-top: 20px; */
-  background: #58B4AE ;
+  /* background: #58B4AE ; */
+  background: #07031A ;
   color: floralwhite;
 }
 .carousel-indicators li {

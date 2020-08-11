@@ -109,16 +109,13 @@ class Header extends Component{
 
     render(){
         const PersonalData = ({ loggedIn}) => {
-            if (!loggedIn) return null;
-          
+            if (!loggedIn) return null;      
             return (
                 <NavItem >
                 <NavLink className="nav-link" to="/dashboard">
                     <span className="fa fa-line-chart fa-lg"></span>Dashboard
                 </NavLink>
-                </NavItem>  
-                
-                
+                </NavItem>              
             );
           };
 
@@ -136,8 +133,7 @@ class Header extends Component{
                                         <NavLink className="nav-link" to="/home">
                                             <span className="fa fa-home fa-lg"></span>Home
                                         </NavLink>
-                                    </NavItem>
-                                    <PersonalData loggedIn={this.props.auth.isAuthenticated}/>   
+                                    </NavItem>  
                                     <NavItem>
                                         <NavLink className="nav-link" to="/about">
                                             <span className="fa fa-info fa-lg"></span>About Us
@@ -148,6 +144,12 @@ class Header extends Component{
                                             <span className="fa fa-address-card fa-lg"></span>Contact Us
                                         </NavLink>
                                     </NavItem>
+                                    <NavItem >
+                                    <NavLink className="nav-link" to="/dashboard">
+                                        <span className="fa fa-line-chart fa-lg"></span>Dashboard
+                                    </NavLink>
+                                    </NavItem>
+                                    {/* <PersonalData loggedIn={this.props.auth.isAuthenticated}/>  */}
                                 </Nav>
                                 <Nav className="ml-auto" navbar>
                                     <NavItem>
@@ -266,43 +268,3 @@ class Header extends Component{
 
 export default Header;
 
-{/* <Modal isOpen = {this.state.isModalSignUpOpen} toggle={this.toggleModalSignUp}>
-<ModalHeader toggle={this.toggleModalSignUp}>Sign Up</ModalHeader>
-<ModalBody>
-    <Form onSubmit={this.handleSignUp}>
-        <FormGroup >
-            <Label htmlFor="productid">Product ID</Label>
-            <Input type="text" id="productid" name="productid" disabled={this.props.product.isVerified}
-            innerRef = {(input) => this.productid = input} /> 
-        </FormGroup>
-        <Button className="primary" disabled={this.props.product.isVerified}
-         onClick={this.handleVerify}>Verify</Button> 
-         <FormGroup>
-            <p visible={this.props.product.isVerified}>Product Verification Successful...</p> 
-        </FormGroup>
-        <FormGroup >
-            <Label htmlFor="firstname">Firstname</Label>
-            <Input type="text" id="firstname" name="firstname" disabled={!this.props.product.isVerified}
-            innerRef = {(input) => this.firstname = input} />       
-        </FormGroup>
-        <FormGroup >
-            <Label htmlFor="lastname">Lastname</Label>
-            <Input type="text" id="lastname" name="lastname" disabled={!this.props.product.isVerified}
-            innerRef = {(input) => this.lastname = input} />       
-        </FormGroup>
-        
-        <FormGroup>
-            <Label htmlFor="username">Email</Label>
-            <Input type="text" id="username" name="username" disabled={!this.props.product.isVerified}
-            innerRef = {(input) => this.username = input} />       
-        </FormGroup>
-        <FormGroup >
-            <Label htmlFor="password">Password</Label>
-            <Input type="password" id="password" name="password"  disabled={!this.props.product.isVerified}
-            innerRef = {(input) => this.password = input} />       
-        </FormGroup>
-        <Button type="submit" value="submit" className="primary" disabled={!this.props.product.isVerified}>Sign Up</Button>
-
-    </Form>
-</ModalBody>
-</Modal> */}
