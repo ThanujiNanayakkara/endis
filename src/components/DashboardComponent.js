@@ -3,12 +3,10 @@ import { Card, CardImg, CardText, CardBody, CardTitle, CardSubtitle, Button,  Mo
 import { auth, firestore } from '../firebase/firebase';
 import {Breadcrumb, BreadcrumbItem} from 'reactstrap';
 import {Link} from 'react-router-dom';
-import {Line, Bar} from 'react-chartjs-2';
+import {Line, Bar, Bubble, Pie} from 'react-chartjs-2';
 import Tabs from 'react-bootstrap/Tabs';
 import Tab from 'react-bootstrap/Tab';
 import ReactDOM from 'react-dom';
-import Graph from './GraphComponent';
-import Footer from './FooterComponent';
 
 class Dashboard extends Component{
     constructor(props){
@@ -21,56 +19,110 @@ class Dashboard extends Component{
             info: [{
                 labels:[],
                 datasets:[{
-                    label:"tv",
-                    backgroundColor: "rgba(0, 0, 130, 0.3)",
-                    pointBackgroundColor: "rgb(0, 0, 130)",
-                    borderColor:"rgba(0, 0, 130)",
+                    label:"Tv",
+                    fontColor: "#ffffff",
+                    backgroundColor: "rgba(0, 0, 200, 0.3)",
+                    pointBackgroundColor: "rgb(0, 0, 200)",
+                    borderColor:"rgba(0, 0, 200)",
                     data:[]
                 }]
                 },{
                 labels:[],
                 datasets:[{
-                    label:"fridge",
-                    backgroundColor: "rgba(0, 130, 0, 0.3)",
-                    pointBackgroundColor: "rgb(0, 130, 0)",
-                    borderColor:"rgba(0, 130, 0)",
+                    label:"Fridge",
+                    backgroundColor: "rgba(0, 180, 0, 0.3)",
+                    pointBackgroundColor: "rgb(0, 180, 0)",
+                    borderColor:"rgba(0, 180, 0)",
                     data:[]
                 }]
                 },{
                 labels:[],
                 datasets:[{
-                    label:"washing machine",
-                    backgroundColor: "rgba(130, 0, 0, 0.3)",
-                    pointBackgroundColor: "rgb(130, 0, 0)",
-                    borderColor:"rgba(130, 0, 0)",
+                    label:"Washing Machine",
+                    backgroundColor: "rgba(200, 0, 0, 0.3)",
+                    pointBackgroundColor: "rgb(200, 0, 0)",
+                    borderColor:"rgba(200, 0, 0)",
+                    
                     data:[]
                 }]
                 },
                 ],
             barInfo: [{
+                labels:[],
+                datasets:[{
+                    label:"Tv",
+                    backgroundColor: "rgba(0, 0, 200, 0.3)",
+                pointBackgroundColor: "rgb(0, 0, 200)",
+                borderColor:"rgba(0, 0, 200)",
+                borderWidth: 5,
+                    data:[]
+                }]
+            },{
+                labels:[],
+                datasets:[{
+                    label:"Fridge",
+                    backgroundColor: "rgba(0, 180, 0, 0.3)",
+                pointBackgroundColor: "rgb(0, 180, 0)",
+                borderColor:"rgba(0, 180, 0)",
+                borderWidth: 5,
+                    data:[]
+                }]
+                },
+                {
                     labels:[],
                     datasets:[{
-                        label:"tv",
-                        backgroundColor: "#fac802",
-                        data:[]
-                    }]
-                },{
-                    labels:[],
-                    datasets:[{
-                        label:"fridge",
-                        backgroundColor: "#fcd22b",
+                        label:"Washing Machine",
+                        backgroundColor: "rgba(200, 0, 0, 0.3)",
+                pointBackgroundColor: "rgb(200, 0, 0)",
+                borderColor:"rgba(200, 0, 0)",
+                        borderWidth: 5,
                         data:[]
                     }]
                     },
-                    {
-                        labels:[],
-                        datasets:[{
-                            label:"washing machine",
-                            backgroundColor: "#fcd94c",
-                            data:[]
-                        }]
-                        },
-                    ],
+                ],
+            bubbleInfo: [{
+                labels:[],
+                datasets:[{
+                    label:"Total",
+                    backgroundColor: "rgba(200, 200, 200, 0.3)",
+                pointBackgroundColor: "rgb(200, 200, 200)",
+                borderColor:"rgba(200, 200, 200)",
+                borderWidth: 5,
+                    data:[]
+                }]
+            },{
+                labels:[],
+                datasets:[{
+                    label:"Tv",
+                    fontColor: "#ffffff",
+                    backgroundColor: "rgba(0, 0, 200, 0.3)",
+                    pointBackgroundColor: "rgb(0, 0, 200)",
+                    borderColor:"rgba(0, 0, 200)",
+                    borderWidth: 5,
+                    data:[]
+                }]
+                },{
+                labels:[],
+                datasets:[{
+                    label:"Fridge",
+                    backgroundColor: "rgba(0, 180, 0, 0.3)",
+                    pointBackgroundColor: "rgb(0, 180, 0)",
+                    borderColor:"rgba(0, 180, 0)",
+                    borderWidth: 5,
+                    data:[]
+                }]
+                },{
+                labels:[],
+                datasets:[{
+                    label:"Washing Machine",
+                    backgroundColor: "rgba(200, 0, 0, 0.3)",
+                    pointBackgroundColor: "rgb(200, 0, 0)",
+                    borderColor:"rgba(200, 0, 0)",
+                    borderWidth: 5,                    
+                    data:[]
+                }]
+                },
+                ],
             //new
             house: '',
             equipment: '',
@@ -201,9 +253,11 @@ class Dashboard extends Component{
                 });
                 this.informUser(doc.data().productId);
                 if(doc.data().productId!==""){
-                    this.readDeviceByDevice("tv",0);
-                    this.readDeviceByDevice("fridge",1);
-                    //this.readGraphDataRealTime();
+                    //this.readDataRealTimeDevByDev("tv",0);
+                    //this.readDataRealTimeDevByDev("fridge",1);
+                    this.readDataRealTime();
+                    //this.readDailyData();
+                    this.readMonthlyData();
                     this.readDailyDataForMonth();
                 }                
             } else {
@@ -242,8 +296,9 @@ class Dashboard extends Component{
             </div>, document.getElementById('notifyD')); 
     }
 
-
-    readGraphDataRealTime(){
+//realtime listener function to capture power usage of devices real time
+//(if usage of each device is stored in one doc)
+    readDataRealTime(){
     var product = this.state.userDetails.productId;
     var deviceTypes=["tv","fridge","washing machine"];
     this.houseRef = firestore.collection('powerData').where("productId","==", product).orderBy("timeFrameNo").onSnapshot(
@@ -263,14 +318,34 @@ class Dashboard extends Component{
             }
             //console.log(this.state.info[device])
             ReactDOM.render(<Line 
-                options = {{responsive:true, style:{backgroundColor:"#000000"} }}
+                options = {{responsive:true, style:{backgroundColor:"#000000"},legend: {
+                    display: true,
+                    labels: {
+                        fontColor: '#ffffff',
+                        fontSize: 20
+                    }
+                },scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true,
+                            fontColor: "#ffffff"
+                        }
+                    }],
+                    xAxes:[{
+                        ticks: {
+                            beginAtZero: true,
+                            fontColor: "#ffffff"
+                        }
+                    }]}
+                } }
                 data={this.state.info[device]}></Line>, document.getElementById('graphs'+device)); 
                 
         }
         })   
     }
-
-    readDeviceByDevice(device,num){
+//realtime listener function to capture power usage of devices real time
+//(if usage of each device is stored in seperate docs) New
+    readDataRealTimeDevByDev(device,num){
         var product = this.state.userDetails.productId;
         this.houseRef = firestore.collection('powerDataTest').where("device", "==", device).where("productId","==", product).orderBy("timeFrameNo").onSnapshot(
             (querySnapshot)=>{
@@ -293,25 +368,84 @@ class Dashboard extends Component{
             }) 
     }
 
+//to get data on previous days of the current month
+//(if daily usage of each user is stored in seperate docs)
+    readDailyData(){
+        var productI = this.state.userDetails.productId;
+        var deviceTypes = ["total","tv","fridge","washingmachine"];
+        var months = ["Jan","Feb","Mar","April","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
+        var end = new Date(Date.now());
+        var month = end.getMonth();
+        var firstDay = new Date(end.getFullYear(), end.getMonth(), 1);
+        var endObj = new Date(end.getFullYear(),end.getMonth(),end.getDate());
+
+        firestore.collection('dailyPowerReadings').where("productId","==",productI).where("timeStamp",">=",firstDay)
+        .where("timeStamp","<", endObj).orderBy("timeStamp").get()
+        .then(
+        (querySnapshot)=>{
+            for (var device in deviceTypes)
+            {
+                //this.state.barInfo[device].labels=[];
+                this.state.bubbleInfo[device].datasets[0].data=[];
+                for (var i in querySnapshot.docs) {
+                    const doc = querySnapshot.docs[i];
+                    const YVal = doc.data()[deviceTypes[device]];
+                    const Obj = {
+                        x: doc.data().timeStamp.toDate().getDate(),
+                        y:YVal,
+                        r:15
+                    }
+                    //this.state.barInfo[device].labels.push( months[month] + doc.data().timeStamp.toDate().getDate());
+                    //this.state.barInfo[device].datasets[0].data.push(YVal);
+                    this.state.bubbleInfo[device].datasets[0].data.push(Obj);                 
+            }
+            ReactDOM.render(<Bubble options= {
+                {
+                    legend: {
+                        display: true,
+                        labels: {
+                            fontColor: '#ffffff',
+                            fontSize: 20
+                        }
+                    },scales: {
+                        yAxes: [{
+                            ticks: {
+                                beginAtZero: true,
+                                fontColor: "#ffffff"
+                            }
+                        }],
+                        xAxes:[{
+                            ticks: {
+                                beginAtZero: true,
+                                fontColor: "#ffffff",
+                                stepSize:1
+                            }
+                        }]}}
+            } data={this.state.bubbleInfo[device]}></Bubble>, document.getElementById('bars'+device)); 
+                
+        }
+        })
+    }
+
+//to get data on previous days of the current month
+//(if daily usage of each user is stored in one doc)
     readDailyDataForMonth(){
         var productI = this.state.userDetails.productId;
-        var productTypes = ["tv","fridge","washingmachine"];
-        var begining = new Date(Date.now()- 604800000);
+        var productTypes = ["total","tv","fridge","washingmachine"];
+        var months = ["Jan","Feb","Mar","April","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
         var end = new Date(Date.now());
-        var beginingDate = begining.getFullYear()+'-'+(begining.getMonth()+1)+'-'+begining.getDate();
-        var endDate = end.getFullYear()+'-'+(end.getMonth()+1)+'-'+end.getDate();
-        var beginingObj = new Date(beginingDate)
-        var endObj = new Date(endDate)
-        firestore.collection('dailyPowerReadings').where("timeStamp",">=",beginingObj)
+        var month = end.getMonth();
+        var firstDay = new Date(end.getFullYear(), end.getMonth(), 1);
+        var endObj = new Date(end.getFullYear(),end.getMonth(),end.getDate());
+
+        firestore.collection('dailyPowerReadings').where("timeStamp",">=",firstDay)
             .where("timeStamp","<", endObj).orderBy("timeStamp").get()
             .then(
             docSnapshots=>{
-                //console.log(docSnapshots.docs[0].data().data[0])
-                //console.log(docSnapshots.docs[1].data().data[1])
                 for (var product in productTypes)
-                {var X=1;
-                this.state.barInfo[product].labels=[];
-                this.state.barInfo[product].datasets[0].data=[];
+                {
+                this.state.bubbleInfo[product].labels=[];
+                this.state.bubbleInfo[product].datasets[0].data=[];
                 for (var j in docSnapshots.docs) {
                     const doc = docSnapshots.docs[j];
                     const Y = doc.data().data;
@@ -320,34 +454,109 @@ class Dashboard extends Component{
                         if ((Y[pro][productI])!== undefined){
                             //console.log(Y[pro][productI])
                             var YData = Y[pro][productI][productTypes[product]]
-                            this.state.barInfo[product].labels.push(X.toString());
-                            this.state.barInfo[product].datasets[0].data.push(YData);
-                            X=X+1;
+                            // this.state.barInfo[product].labels.push( months[month] + doc.data().timeStamp.toDate().getDate());
+                            // this.state.barInfo[product].datasets[0].data.push(YData);
+                            const Obj ={
+                                x:doc.data().timeStamp.toDate().getDate(),
+                                y: YData,
+                                r:20
+                            }
+                            this.state.bubbleInfo[product].datasets[0].data.push(Obj);
                             break;                     
                         }
                     }                                       
                 }
                 //console.log(this.state.barInfo[product])
-                ReactDOM.render(<Bar options= {
-                    {scales: {
-                        yAxes: [{
-                            ticks: {
-                                beginAtZero: true
+                ReactDOM.render(<Bubble options= {
+                    {   
+                        legend: {
+                            display: true,
+                            labels: {
+                                fontColor: '#ffffff',
+                                fontSize: 20
                             }
-                        }]}
-                    }
-                } data={this.state.barInfo[product]}></Bar>, document.getElementById('bars'+product)); 
+                        },scales: {
+                            yAxes: [{
+                                ticks: {
+                                    beginAtZero: true,
+                                    fontColor: "#ffffff"
+                                }
+                            }],
+                            xAxes:[{
+                                ticks: {
+                                    beginAtZero: true,
+                                    fontColor: "#ffffff",
+                                    stepSize:1
+                                }
+                            }]}}
+                } data={this.state.bubbleInfo[product]}></Bubble>, document.getElementById('bars'+product)); 
             }              
             })
     }
 
+    readMonthlyData(){
+        var product = this.state.userDetails.productId;
+        var now = new Date(Date.now());
+        var firstDayOfYear = new Date(now.getFullYear(),1,1);
+        var productTypes = ["tv","fridge","washingmachine"];
+        firestore.collection("monthlyPowerReadings").where("productId","==",product).where("timeStamp",">",firstDayOfYear)
+        .where("timeStamp","<=",now).orderBy("timeStamp")
+        .get()
+        .then(querySnapshot=>{
+            for (var pro in productTypes)
+            {
+                this.state.barInfo[pro].datasets[0].data=[];
+                this.state.barInfo[pro].labels=[];
+                for (var i in querySnapshot.docs) {
+                    const doc = querySnapshot.docs[i];
+                    const YVal = doc.data()[productTypes[pro]];
+                    const XVal = doc.data().month
+                    if(YVal!==undefined & XVal!==undefined){
+                        this.state.barInfo[pro].datasets[0].data.push(YVal);
+                        this.state.barInfo[pro].labels.push(XVal);
+                    }                  
+            }
+            console.log(this.state.barInfo[pro].datasets[0].data)
+            ReactDOM.render(<Bar options= {
+                {   layout:{
+                    padding:{
+                        left:10,
+                        right:10,
+                        top: 10,
+                        bottom:10
+                    }
+                },
+                    legend: {
+                        display: true,
+                        labels: {
+                            fontColor: '#ffffff',
+                            fontSize: 20
+                        }
+                    },scales: {
+                        yAxes: [{
+                            ticks: {
+                                beginAtZero: true,
+                                fontColor: "#ffffff"
+                            }
+                        }],
+                        xAxes:[{
+                            ticks: {
+                                beginAtZero: true,
+                                fontColor: "#ffffff"
+                            }
+                        }]}}
+            } data={this.state.barInfo[pro]}></Bar>, document.getElementById('bubble'+pro)); 
+                
+        }
+        })
+    }
+
     render(){     
         return(
-
                 <div className="dashboard">
                     <div className="row">
                         <div className="col-12 col-md-2 mr-5" style={{width:"100%", height:"100%"}}> 
-                            <Card style={{backgroundColor:"#222222", color:'#ffffff'}}>
+                            <Card style={{backgroundColor:"#808080", color:'#ffffff'}}>
                                 <CardBody className="text-center">
                                     <CardImg src="assets/images/ppic.png" alt="" className="img-fluid mb-3"/>  
                                     <CardTitle className="text-center" >{this.state.userDetails.name}</CardTitle> 
@@ -403,23 +612,23 @@ class Dashboard extends Component{
                             </Card>
                         </div>
                         <div className="col-12 col-md-9 align-self-start">
-                            <Tabs defaultActiveKey="now" id="uncontrolled-tab-example" className="tab-topic">
+                            <Tabs defaultActiveKey="now" id="uncontrolled-tab-example" className="tab-topic" >
                                 <Tab eventKey="now" title="Now" className="tab-item">
                                     <div id="notify">
                                     </div>
                                 
                                     <div className="row equip-choose">
-                                    <div class="form-check col-4">
-                                        <input type="checkbox" class="form-check-input" id="showWashingMachine"></input>
-                                        <label class="form-check-label" for="showWashingMachine">Washing machine</label>
+                                    <div className="form-check col-4">
+                                        <input type="checkbox" className="form-check-input" id="showWashingMachine"></input>
+                                        <label className="form-check-label" htmlFor="showWashingMachine">Washing machine</label>
                                     </div>
-                                    <div class="form-check col-4">
-                                        <input type="checkbox" class="form-check-input" id="showTV"></input>
-                                        <label class="form-check-label" for="showTV">TV</label>
+                                    <div className="form-check col-4">
+                                        <input type="checkbox" className="form-check-input" id="showTV"></input>
+                                        <label className="form-check-label" htmlFor="showTV">TV</label>
                                     </div>
-                                    <div class="form-check col-4">
-                                        <input type="checkbox" class="form-check-input" id="showFridge"></input>
-                                        <label class="form-check-label" for="showFridge">Fridge</label>
+                                    <div className="form-check col-4">
+                                        <input type="checkbox" className="form-check-input" id="showFridge"></input>
+                                        <label className="form-check-label" htmlFor="showFridge">Fridge</label>
                                     </div>
                                     </div>
                             
@@ -427,7 +636,7 @@ class Dashboard extends Component{
                                     
                                     <div className="row">
                                     <div className="col-12 col-md-2"></div>
-                                    <div className="col-12 col-md-7" id='graphs0' style={{position: "relative", backgroundColor:"#ffffff", borderRadius:"10px"}}>
+                                    <div className="col-12 col-md-8" id='graphs0' style={{position: "relative", backgroundColor:"#152238", borderRadius:"10px"}}>
                                     </div>
                                     </div>
                                     
@@ -435,7 +644,7 @@ class Dashboard extends Component{
                                     
                                     <div className="row">
                                     <div className="col-12 col-md-3"></div>
-                                    <div className="col-12 col-md-7" id='graphs1' style={{position: "relative", backgroundColor:"#ffffff", borderRadius:"10px"}}>
+                                    <div className="col-12 col-md-8" id='graphs1' style={{position: "relative", backgroundColor:"#152238", borderRadius:"10px"}}>
                                     </div>
                                     </div>
                                     
@@ -443,20 +652,22 @@ class Dashboard extends Component{
                                     
                                     <div className="row">
                                     <div className="col-12 col-md-2"></div>
-                                    <div className="col-12 col-md-7" id='graphs2' style={{position: "relative", backgroundColor:"#ffffff", borderRadius:"10px"}}>
+                                    <div className="col-12 col-md-8" id='graphs2' style={{position: "relative", backgroundColor:"#152238", borderRadius:"10px"}}>
                                     </div>
                                     </div>
                                 
                                     <br></br><br></br>
+
+            
                                 </Tab>
-                                <Tab eventKey="daily" title="Daily">
+                                <Tab eventKey="daily" title="Daily" className="tab-item ">
                                     <div id="notifyD">
                                     </div>
                                     <br></br><br></br>
                                     
                                     <div className="row">
                                     <div className="col-12 col-md-1"></div>
-                                    <div className="col-12 col-md-8" id='bars0' style={{position: "relative", backgroundColor:"#ffffff", borderRadius:"10px"}}>
+                                    <div className="col-12 col-md-8" id='bars0' style={{position: "relative", backgroundColor:"#152238", borderRadius:"10px"}}>
                                     </div>
                                     </div>
                                     
@@ -464,7 +675,7 @@ class Dashboard extends Component{
                                     
                                     <div className="row">
                                     <div className="col-12 col-md-3"></div>
-                                    <div className="col-12 col-md-8" id='bars1' style={{position: "relative", backgroundColor:"#ffffff", borderRadius:"10px"}}>
+                                    <div className="col-12 col-md-8" id='bars1' style={{position: "relative", backgroundColor:"#152238", borderRadius:"10px"}}>
                                     </div>
                                     </div>
                                     
@@ -472,12 +683,53 @@ class Dashboard extends Component{
                                     
                                     <div className="row">
                                     <div className="col-12 col-md-1"></div>
-                                    <div className="col-12 col-md-8" id='bars2' style={{position: "relative", backgroundColor:"#ffffff", borderRadius:"10px"}}>
+                                    <div className="col-12 col-md-8" id='bars2' style={{position: "relative", backgroundColor:"#152238", borderRadius:"10px"}}>
+                                    </div>
+                                    </div>
+
+                                    <br></br><br></br>
+                                    
+                                    <div className="row">
+                                    <div className="col-12 col-md-3"></div>
+                                    <div className="col-12 col-md-8" id='bars3' style={{position: "relative", backgroundColor:"#152238", borderRadius:"10px"}}>
+                                    </div>
+                                    </div>
+
+                                    <br></br><br></br>
+                                
+                                </Tab>
+                                <Tab eventKey="monthly" title="Monthly" className="tab-item">
+                                <div id="notify">
+                                    </div>
+                            
+                                    <br></br><br></br>
+                                    
+                                    <div className="row">
+                                    <div className="col-12 col-md-2"></div>
+                                    <div className="col-12 col-md-8" id='bubble0' style={{position: "relative", backgroundColor:"#152238", borderRadius:"10px"}}>
+                                    </div>
+                                    </div>
+                                    
+                                    <br></br><br></br>
+                                    
+                                    <div className="row">
+                                    <div className="col-12 col-md-3"></div>
+                                    <div className="col-12 col-md-8" id='bubble1' style={{position: "relative", backgroundColor:"#152238", borderRadius:"10px"}}>
+                                    </div>
+                                    </div>
+                                    
+                                    <br></br><br></br>
+                                    
+                                    <div className="row">
+                                    <div className="col-12 col-md-2"></div>
+                                    <div className="col-12 col-md-8" id='bubble2' style={{position: "relative", backgroundColor:"#152238", borderRadius:"10px"}}>
                                     </div>
                                     </div>
                                 
+                                    <br></br><br></br>
+
                                 </Tab>
-                                <Tab eventKey="monthly" title="Monthly" disabled>
+                                <Tab eventKey="evaluation" title="Evaluation" className="tab-item">
                                 </Tab>
                             </Tabs>
                         </div>

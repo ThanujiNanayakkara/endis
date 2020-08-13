@@ -19,15 +19,15 @@ class About extends Component{
                         
                 </div>
 
-                <div className="about-bottom">
+                <div className="about-bottom ">
 
-                    <div class="col-10 mt-3" >
-                        <div class="card card-shadow">
-                            <div class="card-horizontal post-about" >
-                                <img class="" src="assets/images/about_city.jpg" alt="Card image cap" height="250px"/>
-                                <div class="card-body">
-                                    <h4 class="card-title">Card title</h4>
-                                    <p class="card-text">
+                    <div className ="col-10 mt-3" >
+                        <div className ="card card-shadow">
+                            <div className ="card-horizontal post-about" >
+                                <img className ="" src="assets/images/about_city.jpg" alt="Card image cap" height="250px"/>
+                                <div className ="card-body">
+                                    <h4 className ="card-title">Card title</h4>
+                                    <p className ="card-text">
                                         In this exercise, the idea is to write a paragraph that would be a random passage 
                                         from a story. An effective paragraph is one that has unity (it isn’t a hodgepodge 
                                         of things), focus (everything in the paragraph stacks up to the whatever-it-is the 
@@ -42,12 +42,12 @@ class About extends Component{
 
                     <div className="row">
                         <div className="col-2"></div>
-                        <div class="col-10 mt-3">
-                            <div class="card card-shadow">
-                                <div class="card-horizontal post-about">
-                                    <div class="card-body" >
-                                        <h4 class="card-title">Card title</h4>
-                                        <p class="card-text">
+                        <div className="col-10 mt-3">
+                            <div className="card card-shadow">
+                                <div className="card-horizontal post-about">
+                                    <div className="card-body" >
+                                        <h4 className="card-title">Card title</h4>
+                                        <p className="card-text">
                                             In this exercise, the idea is to write a paragraph that would be a random passage 
                                             from a story. An effective paragraph is one that has unity (it isn’t a hodgepodge 
                                             of things), focus (everything in the paragraph stacks up to the whatever-it-is the 
@@ -55,7 +55,7 @@ class About extends Component{
                                             the paragraph should be quick to read--say, not be more than 100 words long.
                                         </p>
                                     </div>
-                                    <img class="" src="assets/images/about_forest.jpg" alt="Card image cap" height="250px"/>
+                                    <img className="" src="assets/images/about_forest.jpg" alt="Card image cap" height="250px"/>
                                     
                                 </div>
                             </div>
@@ -63,13 +63,13 @@ class About extends Component{
                     </div>
                     <br></br>
 
-                    <div class="col-10 mt-3 mb-3">
-                        <div class="card card-shadow">
-                            <div class="card-horizontal post-about">
-                                <img class="" src="assets/images/about_power.jpg" alt="Card image cap" height="250px"/>
-                                <div class="card-body">
-                                    <h4 class="card-title">Card title</h4>
-                                    <p class="card-text">
+                    <div className="col-10 mt-3 mb-3">
+                        <div className="card card-shadow">
+                            <div className="card-horizontal post-about">
+                                <img className="" src="assets/images/about_power.jpg" alt="Card image cap" height="250px"/>
+                                <div className="card-body">
+                                    <h4 className="card-title">Card title</h4>
+                                    <p className="card-text">
                                         In this exercise, the idea is to write a paragraph that would be a random passage 
                                         from a story. An effective paragraph is one that has unity (it isn’t a hodgepodge 
                                         of things), focus (everything in the paragraph stacks up to the whatever-it-is the 

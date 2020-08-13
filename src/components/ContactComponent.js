@@ -19,25 +19,25 @@ class Contact extends Component{
 
                 <div className="row justify-content-center">
                     <a className="footer-links col-4 d-flex justify-content-center" href="tel:+85212345678">
-                        <div class="card card-contact">
-                            <img class="card-img-top " src="assets/images/phone_white.png" alt="Card image" />
-                            <div class="card-body text-center">
+                        <div className="card card-contact">
+                            <img className="card-img-top " src="assets/images/phone_white.png" alt="Card image" />
+                            <div className="card-body text-center">
                                 <p>+94711608162</p>
                             </div>
                         </div>
                     </a>
                     <a className="footer-links col-4 d-flex justify-content-center" href="mailto:confusion@food.net" >
-                        <div class="card card-contact">
-                            <img class="card-img-top " src="assets/images/email_white.png" alt="Card image" />
-                            <div class="card-body text-center">
+                        <div className="card card-contact">
+                            <img className="card-img-top " src="assets/images/email_white.png" alt="Card image" />
+                            <div className="card-body text-center">
                             <p>endis@gmail.com</p>
                             </div>
                         </div>
                     </a>
                     <a className="footer-links col-4 d-flex justify-content-center" href="https://g.page/moratuwauni?share">
-                        <div class="card card-contact">
-                            <img class="card-img-top " src="assets/images/location_white.png" alt="Card image" />
-                            <div class="card-body text-center">
+                        <div className="card card-contact">
+                            <img className="card-img-top " src="assets/images/location_white.png" alt="Card image" />
+                            <div className="card-body text-center">
                                 <p>University of Moratuwa<br />
                                 Katubedda, Moratuwa<br />
                                 Sri Lanka<br />
