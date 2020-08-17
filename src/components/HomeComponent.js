@@ -9,7 +9,7 @@ class Home extends Component{
         return(
             
             <div className="home">
-                <div className="col-4 justify-content-center">
+                <div className="col-12 col-md-5 justify-content-center mt-5">
                 <h4>Join with us to make better Energy Decisions</h4>
                     <p>We provide all necessary means for equipping your home to have all relevant energy 
                         related data always centrally available for monitoring as well as for basic data

@@ -155,7 +155,7 @@ exports.userDeleted= functions.auth.user()
             productsList.push(doc.data().productId)
         });
         const promises = []
-        var beginningDate = new Date(Date.now() - 84600000);
+        var beginningDate = new Date(Date.now() - 42300000);
         var beginningObject = new Date(beginningDate.getFullYear(),beginningDate.getMonth(),beginningDate.getDate());
         var endDate = new Date(Date.now());
         var endObject = new Date(endDate.getFullYear(),endDate.getMonth(),endDate.getDate())
@@ -196,7 +196,7 @@ exports.userDeleted= functions.auth.user()
         })
         .catch((error)=>{
             console.log("error")
-            res.status(500).send(error)
+            //res.status(500).send(error)
     })        
 });
 
@@ -213,7 +213,7 @@ exports.scheduledFunctionCrontabD = functions.pubsub.schedule('00 00 * * *')
             productsList.push(doc.data().productId)
         });
         const promises = []
-        var beginningDate = new Date(Date.now() - 84600000);
+        var beginningDate = new Date(Date.now() - 42300000);
         var beginningObject = new Date(beginningDate.getFullYear(),beginningDate.getMonth(),beginningDate.getDate());
         var endDate = new Date(Date.now());
         var endObject = new Date(endDate.getFullYear(),endDate.getMonth(),endDate.getDate())
@@ -463,8 +463,9 @@ exports.monthly = functions.https.onRequest((req, res) => {
             productsList.push(doc.data().productId)
         });
         const promises = []
+        var beg = new Date(Date.now()-43200000);
         var end = new Date(Date.now());
-        var firstDay = new Date(end.getFullYear(), end.getMonth(), 1);
+        var firstDay = new Date(beg.getFullYear(), beg.getMonth(), 1);
         var endObj = new Date(end.getFullYear(),end.getMonth(),end.getDate());
         for (product in productsList){
             const p = admin.firestore().collection("powerData").where("productId","==", productsList[product])
@@ -493,10 +494,8 @@ exports.monthly = functions.https.onRequest((req, res) => {
                 powerSum.push({[productName]: {tv: sum[0],fridge: sum[1], washingmachine:sum[2]}})
             })
             var months = ["Jan","Feb","Mar","April","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
-            var end = new Date(Date.now());
+            var end = new Date(Date.now()-43200000);
             var month = months[end.getMonth()];
-            console.log(month);
-            console.log(powerSum);
             const q = admin.firestore().collection("monthlyPowerReadings").add({
                 data: powerSum,
                 month: month
@@ -509,3 +508,61 @@ exports.monthly = functions.https.onRequest((req, res) => {
             res.status(500).send(error)
     }) 
   });
+
+  exports.scheduledMonthly = functions.pubsub.schedule('10 00 01 * *')
+  .timeZone('Asia/Colombo') // Users can choose timezone - default is America/Los_Angeles
+  .onRun((context) => {
+    admin.firestore().collection("issuedProducts").where("active","==", true).get()
+    .then(querySnapshot => {
+        var productsList=[];
+        querySnapshot.forEach(doc => {
+            // doc.data() is never undefined for query doc snapshots
+            productsList.push(doc.data().productId)
+        });
+        const promises = []
+        var beg = new Date(Date.now()-43200000);
+        var end = new Date(Date.now());
+        var firstDay = new Date(beg.getFullYear(), beg.getMonth(), 1);
+        var endObj = new Date(end.getFullYear(),end.getMonth(),end.getDate());
+        for (product in productsList){
+            const p = admin.firestore().collection("powerData").where("productId","==", productsList[product])
+                .where("timeFrameNo",">", firstDay)
+                .where("timeFrameNo", "<=", endObj)
+                .get()
+            promises.push(p)
+        }        
+        return Promise.all(promises)
+    }) 
+        .then(docSnapshots =>{
+            const powerSum=[]
+            const deviceTypes = ["tv","fridge","washing machine"]
+            docSnapshots.forEach(docSnapshot => {
+                var sum=[0,0,0]
+                var productName = "None"
+                docSnapshot.forEach(doc => {
+                    for (device in deviceTypes){
+                        const docdata = doc.data()[deviceTypes[device]]
+                        for (i in docdata){
+                            sum[device]+= docdata[i]
+                        }
+                    }
+                    productName = doc.data().productId
+                })
+                powerSum.push({[productName]: {tv: sum[0],fridge: sum[1], washingmachine:sum[2]}})
+            })
+            var months = ["Jan","Feb","Mar","April","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
+            var end = new Date(Date.now()-43200000);
+            var month = months[end.getMonth()];
+            const q = admin.firestore().collection("monthlyPowerReadings").add({
+                data: powerSum,
+                month: month,
+                timeStamp: end
+            })
+            //res.send("OK")
+            return q
+        })
+        .catch((error)=>{
+            console.log("error")
+            //res.status(500).send(error)
+    })    
+});

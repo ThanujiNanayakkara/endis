@@ -123,6 +123,41 @@ class Dashboard extends Component{
                 }]
                 },
                 ],
+            pieInfo: [{
+                labels:[],
+                datasets:[{
+                    label:"Tv",
+                    backgroundColor: ["#C70039",
+                    "#F37121",
+                    "#FFBD69"],
+                    pointBackgroundColor: "rgb(200, 200, 200)",
+                    borderColor:"rgba(200, 200, 200)",
+                    borderWidth: 5,
+                        data:[]
+                }]
+            },{
+                labels:[],
+                datasets:[{
+                    label:"Fridge",
+                    backgroundColor: "rgba(0, 180, 0, 0.3)",
+                pointBackgroundColor: "rgb(0, 180, 0)",
+                borderColor:"rgba(0, 180, 0)",
+                borderWidth: 5,
+                    data:[]
+                }]
+                },
+                {
+                    labels:[],
+                    datasets:[{
+                        label:"Washing Machine",
+                        backgroundColor: "rgba(200, 0, 0, 0.3)",
+                pointBackgroundColor: "rgb(200, 0, 0)",
+                borderColor:"rgba(200, 0, 0)",
+                        borderWidth: 5,
+                        data:[]
+                    }]
+                    },
+                ],
             //new
             house: '',
             equipment: '',
@@ -133,6 +168,8 @@ class Dashboard extends Component{
         this.toggleModalUpdate= this.toggleModalUpdate.bind(this);
         this.handleVerify= this.handleVerify.bind(this);
         this.readUserData= this.readUserData.bind(this);
+        this.evaluateMonthlyData = this.evaluateMonthlyData.bind(this);
+        this.evaluateTwoMonthData = this.evaluateTwoMonthData.bind(this);
         //new
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
@@ -258,7 +295,7 @@ class Dashboard extends Component{
                     this.readDataRealTime();
                     //this.readDailyData();
                     this.readMonthlyData();
-                    this.readDailyDataForMonth();
+                    this.readDailyDataOD();
                 }                
             } else {
                 // doc.data() will be undefined in this case
@@ -370,7 +407,7 @@ class Dashboard extends Component{
 
 //to get data on previous days of the current month
 //(if daily usage of each user is stored in seperate docs)
-    readDailyData(){
+    readDailyDataSD(){
         var productI = this.state.userDetails.productId;
         var deviceTypes = ["total","tv","fridge","washingmachine"];
         var months = ["Jan","Feb","Mar","April","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
@@ -429,7 +466,7 @@ class Dashboard extends Component{
 
 //to get data on previous days of the current month
 //(if daily usage of each user is stored in one doc)
-    readDailyDataForMonth(){
+    readDailyDataOD(){
         var productI = this.state.userDetails.productId;
         var productTypes = ["total","tv","fridge","washingmachine"];
         var months = ["Jan","Feb","Mar","April","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
@@ -494,6 +531,8 @@ class Dashboard extends Component{
             })
     }
 
+//to get data on previous months of the year
+//(if monthly usage of each user is stored in seperate docs)
     readMonthlyData(){
         var product = this.state.userDetails.productId;
         var now = new Date(Date.now());
@@ -548,6 +587,110 @@ class Dashboard extends Component{
             } data={this.state.barInfo[pro]}></Bar>, document.getElementById('bubble'+pro)); 
                 
         }
+        })
+    }
+
+//evaluating last month data
+    evaluateMonthlyData(){
+        var product = this.state.userDetails.productId;
+        var now = new Date(Date.now());
+        var month = now.getMonth()-1;
+        var year = now.getFullYear();
+        if (month < 0){
+            month= month+12;
+            year = year-1;
+        }
+        var firstDay = new Date(year,month,1);
+        var endDay = new Date(now.getFullYear(),now.getMonth(),1)
+        var deviceTypes = ["tv","fridge","washingmachine"];
+        firestore.collection("monthlyPowerReadings").where("productId","==", product).where("timeStamp",">",firstDay)
+        .where("timeStamp","<",endDay).get()
+        .then(docSnapshot=>{
+            this.state.pieInfo[0].labels=[]
+            this.state.pieInfo[0].datasets[0].data=[]
+            var sum =[0,0,0]
+            if(!docSnapshot.empty){
+                //console.log(docSnapshot.docs[0])
+                for (var device in deviceTypes){                    
+                    // for (var doc in docSnapshot.docs){
+                    //     if(docSnapshot.docs[doc].data()[deviceTypes[device]]!== undefined){
+                    //     sum[device]+= docSnapshot.docs[doc].data()[deviceTypes[device]]
+                    //     }
+                    // }
+                    // this.state.pieInfo[0].labels.push(deviceTypes[device]);
+                    // this.state.pieInfo[0].datasets[0].data.push(sum[device])
+                    if(docSnapshot.docs[0].data()[deviceTypes[device]]!== undefined){
+                        this.state.pieInfo[0].labels.push(deviceTypes[device]);
+                        this.state.pieInfo[0].datasets[0].data.push(docSnapshot.docs[0].data()[deviceTypes[device]])
+                    }
+                }
+                ReactDOM.render(<Pie options= {
+                    {   layout:{
+                        padding:{
+                            left:10,
+                            right:10,
+                            top: 10,
+                            bottom:10
+                        }
+                    },
+                        legend: {
+                            display: true,
+                            labels: {
+                                fontColor: '#ffffff',
+                                fontSize: 20
+                            }
+                        }}
+                } data={this.state.pieInfo[0]}></Pie>, document.getElementById('pie0'));
+            }
+        })
+    }
+    //evaluating last 2 month data
+    evaluateTwoMonthData(){
+        var product = this.state.userDetails.productId;
+        var now = new Date(Date.now());
+        var month = now.getMonth()-2;
+        var year = now.getFullYear();
+        if (month < 0){
+            month= month+12;
+            year = year-1;
+        }
+        var firstDay = new Date(year,month,1);
+        var endDay = new Date(now.getFullYear(),now.getMonth(),1)
+        var deviceTypes = ["tv","fridge","washingmachine"];
+        firestore.collection("monthlyPowerReadings").where("productId","==", product).where("timeStamp",">",firstDay)
+        .where("timeStamp","<",endDay).get()
+        .then(docSnapshot=>{
+            this.state.pieInfo[0].labels=[]
+            this.state.pieInfo[0].datasets[0].data=[]
+            var sum =[0,0,0]
+            if(!docSnapshot.empty){
+                for (var device in deviceTypes){                    
+                    for (var doc in docSnapshot.docs){
+                        if(docSnapshot.docs[doc].data()[deviceTypes[device]]!== undefined){
+                        sum[device]+= docSnapshot.docs[doc].data()[deviceTypes[device]]
+                        }
+                    }
+                    this.state.pieInfo[0].labels.push(deviceTypes[device]);
+                    this.state.pieInfo[0].datasets[0].data.push(sum[device])
+                }
+                ReactDOM.render(<Pie options= {
+                    {   layout:{
+                        padding:{
+                            left:10,
+                            right:10,
+                            top: 10,
+                            bottom:10
+                        }
+                    },
+                        legend: {
+                            display: true,
+                            labels: {
+                                fontColor: '#ffffff',
+                                fontSize: 20
+                            }
+                        }}
+                } data={this.state.pieInfo[0]}></Pie>, document.getElementById('pie0'));
+            }
         })
     }
 
@@ -730,6 +873,41 @@ class Dashboard extends Component{
 
                                 </Tab>
                                 <Tab eventKey="evaluation" title="Evaluation" className="tab-item">
+                                    <div className="col-12 align-items-center">
+                                    <div id="notify">
+                                    </div>
+                                   
+
+                                    <div className="row button-bar" style={{}}>
+                                    <div className="col-4 text-center">
+                                        <Button  onClick={this.evaluateMonthlyData} size="lg" >
+                                            <span className="fas fa-chart-pie "></span> Last Month
+                                        </Button>
+                                    </div>
+                                    <div className=" col-4 text-center">
+                                    <Button  onClick={this.evaluateTwoMonthData} size="lg">
+                                            <span className="fas fa-chart-pie "></span> Last 2 Months                                                        
+                                    </Button>
+                                    </div>
+                                    <div className=" col-4 text-center">
+                                    <Button size="lg">
+                                            <span className="fas fa-chart-pie "></span> Last 3 Months                                                        
+                                    </Button>
+                                    </div>
+                                    </div>
+
+                                    <br></br><br></br>
+                                    
+                                    <div className="row">
+                                    <div className="col-12 col-md-2"></div>
+                                    <div className="col-12 col-md-8" id='pie0' style={{position: "relative", backgroundColor:"#152238", borderRadius:"10px"}}>
+                                    </div>
+                                    </div>
+                                    
+                    
+                                
+                                    <br></br><br></br>
+                                    </div>
                                 </Tab>
                             </Tabs>
                         </div>

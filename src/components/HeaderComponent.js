@@ -121,7 +121,7 @@ class Header extends Component{
 
         return(
                 <React.Fragment>
-                    <Navbar className="header navbar-expand-lg navbar-dark" style={{zIndex:10}}>
+                    <Navbar className="header navbar-expand-md navbar-dark" style={{zIndex:10}}>
                             <div className = 'container' >
                                 <NavbarToggler onClick={this.toggleNav}/>
                                     <NavbarBrand className="mr-auto" href="/home"    style={{position: 'absolute',  left: '40px'}}> 
