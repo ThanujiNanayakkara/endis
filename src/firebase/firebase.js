@@ -7,6 +7,8 @@ firebase.initializeApp(firebaseConfig);
 
 
 export const auth = firebase.auth();
+export const messaging = firebase.messaging();
+export default firebase; 
 export const fireauth = firebase.auth;
 
 // const settings = {timestampsInSnapshots: true};

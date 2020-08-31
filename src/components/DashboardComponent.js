@@ -1,12 +1,13 @@
 import React, {Component} from 'react';
 import { Card, CardImg, CardText, CardBody, CardTitle, CardSubtitle, Button,  Modal, ModalHeader, ModalBody, Form, FormGroup, Input, Label, ListGroup, ListGroupItem } from 'reactstrap';
-import { auth, firestore } from '../firebase/firebase';
+import { auth, firestore, messaging } from '../firebase/firebase';
 import {Breadcrumb, BreadcrumbItem} from 'reactstrap';
-import {Link} from 'react-router-dom';
+
 import {Line, Bar, Bubble, Pie} from 'react-chartjs-2';
 import Tabs from 'react-bootstrap/Tabs';
 import Tab from 'react-bootstrap/Tab';
 import ReactDOM from 'react-dom';
+
 
 class Dashboard extends Component{
     constructor(props){
@@ -81,16 +82,6 @@ class Dashboard extends Component{
                     },
                 ],
             bubbleInfo: [{
-                labels:[],
-                datasets:[{
-                    label:"Total",
-                    backgroundColor: "rgba(200, 200, 200, 0.3)",
-                pointBackgroundColor: "rgb(200, 200, 200)",
-                borderColor:"rgba(200, 200, 200)",
-                borderWidth: 5,
-                    data:[]
-                }]
-            },{
                 labels:[],
                 datasets:[{
                     label:"Tv",
@@ -173,6 +164,8 @@ class Dashboard extends Component{
         //new
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
+        this.handleSubscribe = this.handleSubscribe.bind(this);
+        this.handleUnSubscribe = this.handleUnSubscribe.bind(this);
 
     }
 //this function runs when edit bio button is clicked
@@ -246,6 +239,51 @@ class Dashboard extends Component{
     componentDidMount(){
        this.readUserData();
     }
+    
+    handleTokenRefresh() {
+        return messaging.getToken().then((token) => {
+          firestore.collection('userDetails').doc(auth.currentUser.uid).update({
+            token: token,
+          });
+        });
+        
+      }
+
+    checkSubscription() {
+        firestore.collection('userDetails').doc(auth.currentUser.uid).get().then((snapshot) => {
+          if ( snapshot.data().token !== "" ) {
+            document.getElementById('subscribe').setAttribute("hidden", true);
+            document.getElementById('unsubscribe').removeAttribute("hidden");
+          } else {
+            document.getElementById('unsubscribe').setAttribute("hidden", true);
+            document.getElementById('subscribe').removeAttribute("hidden");
+          }
+        });
+      }
+
+    handleSubscribe(){ 
+        messaging.requestPermission()
+        .then(() => this.handleTokenRefresh())
+        .then(() => this.checkSubscription())
+        .catch((err) => {
+        console.log("error getting permission :(");
+        });
+     }
+
+     handleUnSubscribe(){
+        messaging.getToken()
+        .then((token) => messaging.deleteToken(token))
+        .then(() => {
+            var tokenRef = firestore.collection("userDetails").doc(auth.currentUser.uid);
+            tokenRef.update({
+                token: ""
+            })
+        })
+        .then(() => this.checkSubscription())
+        .catch((err) => {
+          console.log("error deleting token :(");
+        });
+     }
 
     //new
     handleChange(event) {
@@ -284,18 +322,26 @@ class Dashboard extends Component{
         usersRef.get()
         .then(doc => {
             if (doc.exists) {
-                //console.log("Document data:", doc.data().name);
                 this.setState({
                     userDetails: doc.data(),
                 });
                 this.informUser(doc.data().productId);
+                if ( doc.data().token !== "" ) {
+                    document.getElementById('subscribe').setAttribute("hidden", true);
+                    document.getElementById('unsubscribe').removeAttribute("hidden");
+                  } else {
+                    document.getElementById('unsubscribe').setAttribute("hidden", true);
+                    document.getElementById('subscribe').removeAttribute("hidden");
+                  }
                 if(doc.data().productId!==""){
                     //this.readDataRealTimeDevByDev("tv",0);
                     //this.readDataRealTimeDevByDev("fridge",1);
+                     //this.readDailyDataOD();
+                     //keep under this
                     this.readDataRealTime();
-                    //this.readDailyData();
+                    this.readDailyDataSD();
                     this.readMonthlyData();
-                    this.readDailyDataOD();
+                   
                 }                
             } else {
                 // doc.data() will be undefined in this case
@@ -308,9 +354,9 @@ class Dashboard extends Component{
 
     informUser(condition){
         ReactDOM.render(
-            <div>
+            <div className="mt-3">
             {condition !== "" ? null :
-            <Card>
+            <Card >
                 <CardBody>
                     <CardTitle className="text-center">
                         No power data to be shown as product ID is not specified. Please proceed to edit your bio in order to add the product ID.
@@ -322,7 +368,7 @@ class Dashboard extends Component{
         ReactDOM.render(
             <div>
             {condition !== "" ? null :
-            <Card>
+            <Card >
                 <CardBody>
                     <CardTitle className="text-center">
                         No power data to be shown as product ID is not specified. Please proceed to edit your bio in order to add the product ID.
@@ -330,7 +376,44 @@ class Dashboard extends Component{
                 </CardBody>
             </Card>
             }
-            </div>, document.getElementById('notifyD')); 
+            </div>, document.getElementById('notifyD'));
+            ReactDOM.render(
+                <div>
+                {condition !== "" ? null :
+                <Card >
+                    <CardBody>
+                        <CardTitle className="text-center">
+                            No power data to be shown as product ID is not specified. Please proceed to edit your bio in order to add the product ID.
+                        </CardTitle>
+                    </CardBody>
+                </Card>
+                }
+                </div>, document.getElementById('notifyM')); 
+                ReactDOM.render(
+                    <div>
+                    {condition !== "" ? null :
+                    <Card >
+                        <CardBody>
+                            <CardTitle className="text-center">
+                                No power data to be shown as product ID is not specified. Please proceed to edit your bio in order to add the product ID.
+                            </CardTitle>
+                        </CardBody>
+                    </Card>
+                    }
+                    </div>, document.getElementById('notifyE')); 
+        console.log(condition);
+        if(condition !== "") {
+        document.getElementById('buttonBar').removeAttribute("hidden");
+        document.getElementById('subscribe').removeAttribute("disabled");
+        document.getElementById('unsubscribe').removeAttribute("disabled"); 
+        
+        }
+        else{
+        document.getElementById('buttonBar').setAttribute("hidden",true);
+        document.getElementById('subscribe').setAttribute("disabled",true);
+        document.getElementById('unsubscribe').setAttribute("disabled",true);
+
+        }
     }
 
 //realtime listener function to capture power usage of devices real time
@@ -409,7 +492,7 @@ class Dashboard extends Component{
 //(if daily usage of each user is stored in seperate docs)
     readDailyDataSD(){
         var productI = this.state.userDetails.productId;
-        var deviceTypes = ["total","tv","fridge","washingmachine"];
+        var deviceTypes = ["tv","fridge","washingmachine"];
         var months = ["Jan","Feb","Mar","April","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
         var end = new Date(Date.now());
         var month = end.getMonth();
@@ -436,6 +519,7 @@ class Dashboard extends Component{
                     //this.state.barInfo[device].datasets[0].data.push(YVal);
                     this.state.bubbleInfo[device].datasets[0].data.push(Obj);                 
             }
+            this.state.bubbleInfo[device].datasets[0].label = this.state.bubbleInfo[device].datasets[0].label +"-"+ months[month];
             ReactDOM.render(<Bubble options= {
                 {
                     legend: {
@@ -456,6 +540,11 @@ class Dashboard extends Component{
                                 beginAtZero: true,
                                 fontColor: "#ffffff",
                                 stepSize:1
+                            },
+                            scaleLabel: {
+                                display: true,
+                                labelString: "Day",
+                                fontColor: "#ffffff"
                             }
                         }]}}
             } data={this.state.bubbleInfo[device]}></Bubble>, document.getElementById('bars'+device)); 
@@ -699,14 +788,15 @@ class Dashboard extends Component{
                 <div className="dashboard">
                     <div className="row">
                         <div className="col-12 col-md-2 mr-5" style={{width:"100%", height:"100%"}}> 
-                            <Card style={{backgroundColor:"#808080", color:'#ffffff'}}>
+                            <div className="column">
+                            <Card style={{backgroundColor:"#ffffff", color:'#000000'}}>
                                 <CardBody className="text-center">
                                     <CardImg src="assets/images/ppic.png" alt="" className="img-fluid mb-3"/>  
                                     <CardTitle className="text-center" >{this.state.userDetails.name}</CardTitle> 
-                                    <ListGroup variant="flush" style={{fontSize:15, color:'#000000'}}>
-                                        <ListGroupItem>Email: {auth.currentUser.email}</ListGroupItem>
-                                        <ListGroupItem>Product Id: {this.state.userDetails.productId}</ListGroupItem>
-                                        <ListGroupItem>Address: {this.state.userDetails.address}</ListGroupItem>
+                                    <ListGroup  variant="flush" style={{fontSize:15, color:'#000000',backgroundColor:"#808080"}}>
+                                        <ListGroupItem className= "listgroupitem">Email: {auth.currentUser.email}</ListGroupItem>
+                                        <ListGroupItem className= "listgroupitem">Product Id: {this.state.userDetails.productId}</ListGroupItem>
+                                        <ListGroupItem className= "listgroupitem">Address: {this.state.userDetails.address}</ListGroupItem>
                                      </ListGroup>
                                     <Button color="warning" className="mt-2" onClick={this.toggleModalUpdate}>
                                      Change bio
@@ -753,14 +843,29 @@ class Dashboard extends Component{
                                 </ModalBody>
                                 </Modal>
                             </Card>
+                            <Card style={{backgroundColor:"#ffffff", color:'#000000'}} className="mt-3">
+                                <CardBody className="text-center">
+                                    <CardImg src="assets/images/ppic.png" alt="" className="img-fluid mb-3"/>  
+                                    <CardTitle className="text-center" >Enable Notifications</CardTitle> 
+                                    <CardSubtitle className="text-center listgroupitem">If you wanna recieve messages on any abnormalities in your power consumption, click the button below and subscribe to our service</CardSubtitle>                                  
+                                    <Button color="danger" className="mt-2" onClick={this.handleSubscribe} id="subscribe">
+                                     Subscribe
+                                    </Button>
+                                    <Button color="secondary" className="mt-2" onClick={this.handleUnSubscribe} id="unsubscribe" hidden>
+                                     Unsubscribe
+                                    </Button>
+                                </CardBody>
+                                </Card>
+
+                            </div>
                         </div>
                         <div className="col-12 col-md-9 align-self-start">
                             <Tabs defaultActiveKey="now" id="uncontrolled-tab-example" className="tab-topic" >
-                                <Tab eventKey="now" title="Now" className="tab-item">
+                                <Tab eventKey="now" title="Current" className="tab-item">
                                     <div id="notify">
                                     </div>
                                 
-                                    <div className="row equip-choose">
+                                    {/* <div className="row equip-choose">
                                     <div className="form-check col-4">
                                         <input type="checkbox" className="form-check-input" id="showWashingMachine"></input>
                                         <label className="form-check-label" htmlFor="showWashingMachine">Washing machine</label>
@@ -773,7 +878,7 @@ class Dashboard extends Component{
                                         <input type="checkbox" className="form-check-input" id="showFridge"></input>
                                         <label className="form-check-label" htmlFor="showFridge">Fridge</label>
                                     </div>
-                                    </div>
+                                    </div> */}
                             
                                     <br></br><br></br>
                                     
@@ -832,17 +937,17 @@ class Dashboard extends Component{
 
                                     <br></br><br></br>
                                     
-                                    <div className="row">
+                                    {/* <div className="row">
                                     <div className="col-12 col-md-3"></div>
                                     <div className="col-12 col-md-8" id='bars3' style={{position: "relative", backgroundColor:"#152238", borderRadius:"10px"}}>
                                     </div>
                                     </div>
 
-                                    <br></br><br></br>
+                                    <br></br><br></br> */}
                                 
                                 </Tab>
                                 <Tab eventKey="monthly" title="Monthly" className="tab-item">
-                                <div id="notify">
+                                <div id="notifyM">
                                     </div>
                             
                                     <br></br><br></br>
@@ -873,12 +978,14 @@ class Dashboard extends Component{
 
                                 </Tab>
                                 <Tab eventKey="evaluation" title="Evaluation" className="tab-item">
-                                    <div className="col-12 align-items-center">
-                                    <div id="notify">
+                                <div id="notifyE">
                                     </div>
+                            
+                                    <br></br><br></br>
+                                    <div className="col-12 align-items-center">
                                    
 
-                                    <div className="row button-bar" style={{}}>
+                                    <div className="row button-bar" style={{}} id="buttonBar">
                                     <div className="col-4 text-center">
                                         <Button  onClick={this.evaluateMonthlyData} size="lg" >
                                             <span className="fas fa-chart-pie "></span> Last Month

@@ -138,6 +138,10 @@ html{
   background-color: #0f0f0f;
 }
 
+.listgroupitem {
+  font-size:15; color:#000000;background-color:#cac7c7;
+}
+
 address{
   font-size:80%;
   margin:0px;
@@ -169,12 +173,14 @@ address{
 .tab-topic{
   
   font-size:150%;
+  margin: 10px;
  
 }
 
 .tab-item{
   /* background-color:#222222; */
   background-color:#808080;
+  
 }
 
 .form-check{

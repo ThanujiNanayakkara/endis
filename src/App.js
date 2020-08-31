@@ -4,7 +4,6 @@ import './App.css';
 import {BrowserRouter} from 'react-router-dom';
 import { Provider } from 'react-redux';
 import { ConfigureStore } from './redux/configureStore';
-//import { authStateChange} from './redux/ActionCreators';
 
 const store = ConfigureStore();
 
@@ -14,6 +13,8 @@ const store = ConfigureStore();
 
 class App extends Component {
 
+  componentDidMount(){
+  }
   render(){
   return (
     <Provider store={store}>

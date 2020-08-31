@@ -7,7 +7,6 @@ import About from './AboutComponent';
 import Home from './HomeComponent';
 import Contact from './ContactComponent';
 import Dashboard from './DashboardComponent';
-
 import {Switch, Route, Redirect, withRouter} from 'react-router-dom';
 import { connect } from 'react-redux';
 import { signUpUser, loginUser, logoutUser, productIdVerification, resetSignUpForm, authStateChange} from '../redux/ActionCreators';
@@ -25,9 +24,10 @@ const mapDispatchToProps = (dispatch) => ({
     logoutUser: () => dispatch(logoutUser()),
     productIdVerification: (product)=>dispatch(productIdVerification(product)),
     resetSignUpForm:()=>dispatch(resetSignUpForm()),
-    authStateChange:()=>dispatch(authStateChange()),
+    authStateChange:()=>dispatch(authStateChange())
       });
   
+
 
 
 class Main extends Component{
@@ -38,7 +38,9 @@ class Main extends Component{
 
     componentWillUnmount() {
         this.props.logoutUser();
-      }    
+      }   
+    
+      
 
     render(){
         const PrivateRoute = ({ component: Component, ...rest }) => (
