@@ -179,8 +179,17 @@ address{
 
 .tab-item{
   /* background-color:#222222; */
-  background-color:#808080;
+  /* background-color:#808080; */
+  background-color:#ffffff;
   
+  
+}
+
+.tab-consumer-item{
+  background-color:#808080;
+  margin:20px;
+  padding: 20px 20px 20px 20px ;
+  border-radius: 8px;
 }
 
 .form-check{
@@ -198,4 +207,166 @@ address{
 .equip-choose{
   padding:30px 45px 30px 45px;
   border-radius: 10px 10px 0px 0px;
+}
+
+/* new */
+.card-counter{
+  box-shadow: 2px 2px 10px #DADADA;
+  margin: 5px;
+  padding: 20px 10px;
+  background-color: #fff;
+  height: 120px;
+  border-radius: 30px;
+  transition: .3s linear all;
+}
+
+.card-counter:hover{
+  box-shadow: 4px 4px 20px #DADADA;
+  transition: .3s linear all;
+}
+
+.card-counter.primary{
+  background-color: #007bff;
+  color: #FFF;
+}
+
+.card-counter.danger{
+  background-color: #ef5350;
+  color: #FFF;
+}  
+
+.card-counter.success{
+  background-color: #66bb6a;
+  color: #FFF;
+}  
+
+.card-counter.info{
+  background-color: #26c6da;
+  color: #FFF;
+}  
+
+.card-counter i{
+  font-size: 5em;
+  opacity: 0.2;
+}
+
+.card-counter .count-numbers{
+  position: absolute;
+  right: 35px;
+  top: 20px;
+  font-size: 24px;
+  display: block;
+}
+
+.card-counter .count-name{
+  position: absolute;
+  right: 35px;
+  top: 65px;
+  font-style: italic;
+  text-transform: capitalize;
+  opacity: 0.5;
+  display: block;
+  font-size: 22px;
+  color: #000000;
+}
+
+.card-consumer{
+  box-shadow: 2px 2px 10px #DADADA;
+  
+  padding: 20px 10px;
+  background-color: #fff;
+  margin: 5px;
+  border-radius: 30px;
+  transition: .3s linear all;
+}
+
+.card-consumer:hover{
+  box-shadow: 4px 4px 20px #DADADA;
+  transition: .3s linear all;
+}
+.card-consumer.large{
+  background-color: #ecb10d;
+  color: #FFF;
+  height: 120px;
+  
+  
+}
+
+.card-consumer.medium{
+  background-color: #0decce;
+  color: #FFF;
+  height: 100px;
+  margin-top: 20px;
+}
+
+.card-consumer.small{
+  background-color: #ec0d45;
+  color: #FFF;
+  height: 80px;
+  margin-top: 40px;
+}
+
+.card-consumer .count-numbers-large{
+  position: absolute;
+  right: 35px;
+  top: 20px;
+  font-size: 24px;
+  display: block;
+}
+
+.card-consumer .count-name-large{
+  position: absolute;
+  right: 35px;
+  top: 65px;
+  font-style: italic;
+  text-transform: capitalize;
+  opacity: 0.5;
+  display: block;
+  font-size: 22px;
+  color: #000000;
+}
+
+.card-consumer .count-numbers-medium{
+  position: absolute;
+  right: 35px;
+  top: 40px;
+  font-size: 24px;
+  display: block;
+}
+
+.card-consumer .count-name-medium{
+  position: absolute;
+  right: 35px;
+  top: 75px;
+  font-style: italic;
+  text-transform: capitalize;
+  opacity: 0.5;
+  display: block;
+  font-size: 22px;
+  color: #000000;
+}
+
+.card-consumer .count-numbers-small{
+  position: absolute;
+  right: 35px;
+  top: 60px;
+  font-size: 24px;
+  display: block;
+}
+
+.card-consumer .count-name-small{
+  position: absolute;
+  right: 35px;
+  top: 85px;
+  font-style: italic;
+  text-transform: capitalize;
+  opacity: 0.5;
+  display: block;
+  font-size: 18px;
+  color: #000000;
+}
+
+.card-consumer i{
+  font-size: 5em;
+  opacity: 0.2;
 }

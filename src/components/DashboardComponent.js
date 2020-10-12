@@ -149,6 +149,21 @@ class Dashboard extends Component{
                     }]
                     },
                 ],
+            today: "Calculating..",
+            thisWeek: "Calculating..",
+            thisMonth: "Calculating..",
+            thisMonthDup: 0,
+            thisWeekDup: 0,
+            uptoNow : [],
+            dataUptoNow:[],
+            uptoMonth: [],
+            leadingConsumers:[0,0,0],
+            leadingConsumersNames:[],
+            devices:["Tv","Fridge","Washing Machine"],
+            leadingConsumersM: [0,0,0],
+            leadingConsumersMNames:[],
+             sort:[],
+            sortDev :[],
             //new
             house: '',
             equipment: '',
@@ -334,11 +349,15 @@ class Dashboard extends Component{
                     document.getElementById('subscribe').removeAttribute("hidden");
                   }
                 if(doc.data().productId!==""){
-                    //this.readDataRealTimeDevByDev("tv",0);
-                    //this.readDataRealTimeDevByDev("fridge",1);
+                    this.setState({
+                        uptoNow:[],
+                    })
+                    this.readDataRealTimeDevByDev("tv",0);
+                    this.readDataRealTimeDevByDev("fridge",1);
+                    this.readDataRealTimeDevByDev("washingmachine",2);                  
                      //this.readDailyDataOD();
                      //keep under this
-                    this.readDataRealTime();
+                    //this.readDataRealTime();
                     this.readDailyDataSD();
                     this.readMonthlyData();
                    
@@ -401,7 +420,7 @@ class Dashboard extends Component{
                     </Card>
                     }
                     </div>, document.getElementById('notifyE')); 
-        console.log(condition);
+        //console.log(condition);
         if(condition !== "") {
         document.getElementById('buttonBar').removeAttribute("hidden");
         document.getElementById('subscribe').removeAttribute("disabled");
@@ -467,23 +486,105 @@ class Dashboard extends Component{
 //(if usage of each device is stored in seperate docs) New
     readDataRealTimeDevByDev(device,num){
         var product = this.state.userDetails.productId;
-        this.houseRef = firestore.collection('powerDataTest').where("device", "==", device).where("productId","==", product).orderBy("timeFrameNo").onSnapshot(
+        var now = new Date(Date.now());
+        var firstDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        this.houseRef = firestore.collection('powerDataTest').where("device", "==", device).where("productId","==", product).where("timeFrameNo",">=",firstDay).orderBy("timeFrameNo").onSnapshot(
             (querySnapshot)=>{
+                var sumNow = 0;
                 var XVal=1;
                 this.state.info[num].labels=[];
                 this.state.info[num].datasets[0].data=[];
                 for (var i in querySnapshot.docs) {
                     const doc = querySnapshot.docs[i];
+                    const time = (doc.data().timeFrameNo.seconds)*1000;
                     const YVal = doc.data()[device];
                     for (var j in YVal) {
-                        this.state.info[num].labels.push(XVal.toString());
+                        this.state.info[num].labels.push(new Date(time + (XVal-1)*3000));
+                        console.log(new Date(time + (XVal-1)*3));
                         this.state.info[num].datasets[0].data.push(YVal[j]);
+                        sumNow=sumNow+YVal[j];
                         XVal=XVal+1;
                 }                      
                 }
                 //console.log(this.state.info[device])
-                ReactDOM.render(<Line options = {{responsive:true}}
-                    data={this.state.info[num]}></Line>, document.getElementById('graphs'+ num)); 
+            ReactDOM.render(<Line  options= {
+                {
+                    
+                    responsive:true,
+                    legend: {
+                        display: true,
+                        labels: {
+                            fontColor: '#ffffff',
+                            fontSize: 20
+                        }
+                    },
+                
+                    scales: {
+                        yAxes: [{
+                            ticks: {
+                                beginAtZero: true,
+                                fontColor: "#ffffff"
+                            }
+                        }],
+                        
+                        xAxes:[{ 
+                            type:"time",
+                            distribution: "linear",
+                            time:{
+                                displayFormats:{
+                                    millisecond: "mm:ss:SSS"
+                                }
+                            },
+                            // time: {
+                            //     parser: 'MM/DD/YYYY HH:mm',
+                            //     // round: 'day'
+                            //     tooltipFormat: 'll HH:mm'
+                            // },
+                            ticks: {
+                                //beginAtZero: true,
+                                fontColor: "#ffffff",
+                                //stepSize:100
+                            },
+                            scaleLabel: {
+                                display: true,
+                                labelString: "Time",
+                                fontColor: "#ffffff",
+                                // stepSize: 100,
+                            }
+                        }]}}
+            }
+                data={this.state.info[num]}></Line>, document.getElementById('graphs'+ num));
+            //console.log("here");
+            this.state.uptoNow[num]= sumNow;
+            this.state.dataUptoNow[num]= sumNow;
+            var lead = this.state.dataUptoNow;
+            var sum = this.state.uptoNow.reduce(function(a, b){
+                return a + b;
+            }, 0);
+            // console.log(this.state.uptoNow);
+            //console.log(lead);
+            if(lead.length === 3) {                 
+                for (var i in lead) {    
+                var max = lead.reduce(function(a, b) {
+                    return Math.max(a, b);
+                });
+                //console.log(max)
+                var ind = lead.indexOf(max);
+                //console.log(ind);
+                this.state.sort.push(lead[ind]);
+                this.state.sortDev.push(this.state.devices[ind])
+                lead[ind]=-1; 
+            }             
+            }
+            //lead.sort();
+            // lead.reverse();
+            this.setState({
+                today: Math.round(sum),
+                thisMonth: this.state.thisMonthDup + Math.round(sum),
+                thisWeek: this.state.thisWeekDup + Math.round(sum),
+                leadingConsumers: this.state.sort,
+                leadingConsumersNames: this.state.sortDev
+            })
             
             }) 
     }
@@ -491,6 +592,7 @@ class Dashboard extends Component{
 //to get data on previous days of the current month
 //(if daily usage of each user is stored in seperate docs)
     readDailyDataSD(){
+        console.log("Daily Data");
         var productI = this.state.userDetails.productId;
         var deviceTypes = ["tv","fridge","washingmachine"];
         var months = ["Jan","Feb","Mar","April","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
@@ -498,14 +600,19 @@ class Dashboard extends Component{
         var month = end.getMonth();
         var firstDay = new Date(end.getFullYear(), end.getMonth(), 1);
         var endObj = new Date(end.getFullYear(),end.getMonth(),end.getDate());
+        var weekBefore = new Date(end.getFullYear(), end.getMonth(),end.getDate()-7);
+        var dataUptoMonth = []
 
         firestore.collection('dailyPowerReadings').where("productId","==",productI).where("timeStamp",">=",firstDay)
         .where("timeStamp","<", endObj).orderBy("timeStamp").get()
         .then(
         (querySnapshot)=>{
+            var sum = 0;
+            var sumWeek = 0;
             for (var device in deviceTypes)
             {
                 //this.state.barInfo[device].labels=[];
+                var sumMonth = 0;
                 this.state.bubbleInfo[device].datasets[0].data=[];
                 for (var i in querySnapshot.docs) {
                     const doc = querySnapshot.docs[i];
@@ -515,10 +622,18 @@ class Dashboard extends Component{
                         y:YVal,
                         r:15
                     }
+                    if (doc.data().timeStamp.toDate() >= weekBefore){
+                        sumWeek += YVal;
+                        console.log("thisweek")
+                    }
+                    
                     //this.state.barInfo[device].labels.push( months[month] + doc.data().timeStamp.toDate().getDate());
                     //this.state.barInfo[device].datasets[0].data.push(YVal);
-                    this.state.bubbleInfo[device].datasets[0].data.push(Obj);                 
+                    this.state.bubbleInfo[device].datasets[0].data.push(Obj);
+                    sum=sum+YVal;
+                    sumMonth = sumMonth + YVal;                
             }
+
             this.state.bubbleInfo[device].datasets[0].label = this.state.bubbleInfo[device].datasets[0].label +"-"+ months[month];
             ReactDOM.render(<Bubble options= {
                 {
@@ -544,12 +659,40 @@ class Dashboard extends Component{
                             scaleLabel: {
                                 display: true,
                                 labelString: "Day",
-                                fontColor: "#ffffff"
+                                fontColor: "#ffffff",
                             }
                         }]}}
             } data={this.state.bubbleInfo[device]}></Bubble>, document.getElementById('bars'+device)); 
-                
+            this.setState({
+                thisMonth: Math.round(sum+this.state.today),
+                thisMonthDup: Math.round(sum),
+                thisWeek: Math.round(sumWeek +this.state.today),
+                thisWeekDup: Math.round(sumWeek),
+            }) 
+            this.state.uptoMonth[device] = sumMonth;
+            dataUptoMonth[device]=sumMonth;
+     
         }
+        var sumUpto = this.state.uptoNow.map(function (num, idx) {
+            return num + dataUptoMonth[idx];
+          });
+        //var leadM = this.state.uptoMonth;
+        var leadM = sumUpto;
+        var sortM=[]
+        var sortMDev =[]
+        for (var i in leadM){            
+            var max = leadM.reduce(function(a, b) {
+                return Math.max(a, b);
+            });
+            var ind = leadM.indexOf(max);
+            sortM.push(leadM[ind]);
+            sortMDev.push(this.state.devices[ind])
+            leadM[ind]=-1;            
+        }
+        this.setState({
+            leadingConsumersM:sortM,
+            leadingConsumersMNames: sortMDev,
+        })
         })
     }
 
@@ -644,7 +787,7 @@ class Dashboard extends Component{
                         this.state.barInfo[pro].labels.push(XVal);
                     }                  
             }
-            console.log(this.state.barInfo[pro].datasets[0].data)
+            //console.log(this.state.barInfo[pro].datasets[0].data)
             ReactDOM.render(<Bar options= {
                 {   layout:{
                     padding:{
@@ -860,6 +1003,120 @@ class Dashboard extends Component{
                             </div>
                         </div>
                         <div className="col-12 col-md-9 align-self-start">
+                            <div className="container">
+                                <Card>
+                                <CardBody>
+                                <CardTitle style={{fontSize:"30px", color:"#000000"}}>Upto Now - Total Power Consumption</CardTitle>
+                                <div className="row">
+                                <div className="col-md-4">
+                                <div className="card-counter primary">
+                                    <i className="fa fa-clock-o"></i>
+                                    <span className="count-name">Today</span>
+                                <span className="count-numbers">{this.state.today}</span>
+                                    
+                                </div>
+                                </div>
+
+                                <div className="col-md-4">
+                                <div className="card-counter danger">
+                                    <i className="fa fa-calendar"></i>
+                                <span className="count-numbers">{this.state.thisWeek}</span>
+                                    <span className="count-name">Last 7 days</span>
+                                </div>
+                                </div>
+
+                                <div className="col-md-4">
+                                <div className="card-counter success">
+                                    <i className="fa fa-area-chart"></i>
+                                <span className="count-numbers">{this.state.thisMonth}</span>
+                                    <span className="count-name">Current billing period</span>
+                                </div>
+                                </div>
+                               
+
+                            </div>
+                            </CardBody>
+                            </Card>
+                            </div>
+
+                            <div className="container mt-4">
+                                <Card>
+                                    <CardBody>
+                                    <CardTitle style={{fontSize:"30px", color:"#000000"}}>Leading Power Consumers</CardTitle>
+                                    <Tabs defaultActiveKey="now" id="uncontrolled-tab-example" className="tab-topic" >
+                                <Tab eventKey="now" title="Today" className="tab-consumer-item">
+                                <div className="row">
+                                <div className="col-md-4">
+                                <div className="card-consumer large">
+                                    <i className="fa fa-fire"></i>
+                                <span className="count-name-large">{this.state.leadingConsumersNames[0]}</span>
+                                <span className="count-numbers-large">{Math.round(this.state.leadingConsumers[0])}</span>
+                                    
+                                </div>
+                                </div>
+
+                                <div className="col-md-4">
+                                <div className="card-consumer medium">
+                                    <i className="fa fa-fire"></i>
+                                <span className="count-numbers-medium">{Math.round(this.state.leadingConsumers[1])}</span>
+                                    <span className="count-name-medium">{this.state.leadingConsumersNames[1]}</span>
+                                </div>
+                                </div>
+
+                                <div className="col-md-4">
+                                <div className="card-consumer small">
+                                    <i className="fa fa-fire"></i>
+                                <span className="count-numbers-small">{Math.round(this.state.leadingConsumers[2])}</span>
+                                    <span className="count-name-small">{this.state.leadingConsumersNames[2]}</span>
+                                </div>
+                                </div>
+                               
+
+                            </div>           
+                                </Tab>
+                
+                                <Tab eventKey="monthly" title="This Month" className="tab-consumer-item">
+                                <div className="row">
+                                <div className="col-md-4">
+                                <div className="card-consumer large">
+                                    <i className="fa fa-fire"></i>
+                                <span className="count-name-large">{this.state.leadingConsumersMNames[0]}</span>
+                                <span className="count-numbers-large">{Math.round(this.state.leadingConsumersM[0])}</span>
+                                    
+                                </div>
+                                </div>
+
+                                <div className="col-md-4">
+                                <div className="card-consumer medium">
+                                    <i className="fa fa-fire"></i>
+                                <span className="count-numbers-medium">{Math.round(this.state.leadingConsumersM[1])}</span>
+                                    <span className="count-name-medium">{this.state.leadingConsumersMNames[1]}</span>
+                                </div>
+                                </div>
+
+                                <div className="col-md-4">
+                                <div className="card-consumer small">
+                                    <i className="fa fa-fire"></i>
+                                <span className="count-numbers-small">{Math.round(this.state.leadingConsumersM[2])}</span>
+                                    <span className="count-name-small">{this.state.leadingConsumersMNames[2]}</span>
+                                </div>
+                                </div>
+                               
+
+                            </div>  
+
+                                </Tab>
+                                
+                            </Tabs>
+
+                                    </CardBody>
+                                </Card>
+                            </div>
+                            
+                            <div className="container mt-4">
+                            <Card>
+                            <CardBody>
+                            <CardTitle style={{fontSize:"30px", color:"#000000"}}>Power Usage - In detail</CardTitle>
                             <Tabs defaultActiveKey="now" id="uncontrolled-tab-example" className="tab-topic" >
                                 <Tab eventKey="now" title="Current" className="tab-item">
                                     <div id="notify">
@@ -1017,6 +1274,13 @@ class Dashboard extends Component{
                                     </div>
                                 </Tab>
                             </Tabs>
+                            </CardBody>
+                            </Card>
+                            </div>
+                            
+                            
+                            
+                            
                         </div>
                     </div>
                 </div>
