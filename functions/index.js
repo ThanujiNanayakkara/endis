@@ -11,8 +11,12 @@ admin.initializeApp();
 // // Create and Deploy Your First Cloud Functions
 // // https://firebase.google.com/docs/functions/write-firebase-functions
 //
-// exports.helloWorld = functions.https.onRequest((request, response) => {
-//  response.send("Hello from Firebase!");
+// exports.helloWorldNew = functions.https.onRequest((request, response) => {
+//     console.log(request.body.name);
+//     console.log(request.body);
+
+
+//  response.send("Hello from Firebase!" + request.body.name);
 // });
 // The Cloud Functions for Firebase SDK to create Cloud Functions and setup triggers.
 
@@ -122,80 +126,80 @@ admin.initializeApp();
 // });
  
 //authentication trigger function
-exports.userJoined= functions.auth.user()
-    .onCreate(user=>{
-        //console.log('user created',user.email,user.uid);
-        return admin.firestore().collection('userDetails')
-        .doc(user.uid).set({
-            email:user.email,
-            productId: "",
-            token: ""
-        });
+// exports.userJoined= functions.auth.user()
+//     .onCreate(user=>{
+//         //console.log('user created',user.email,user.uid);
+//         return admin.firestore().collection('userDetails')
+//         .doc(user.uid).set({
+//             email:user.email,
+//             productId: "",
+//             token: ""
+//         });
 
-});
+// });
 
-//authentication trigger function
-exports.userDeleted= functions.auth.user()
-    .onDelete(user=>{
-        //console.log('user created',user.email,user.uid);
-        const doc = admin.firestore().collection('userDetails').doc(user.uid);
-        return doc.delete();
+// //authentication trigger function
+// exports.userDeleted= functions.auth.user()
+//     .onDelete(user=>{
+//         //console.log('user created',user.email,user.uid);
+//         const doc = admin.firestore().collection('userDetails').doc(user.uid);
+//         return doc.delete();
 
-});
+// });
 
-exports.sendNotifications = functions.firestore
-  .document('powerDataTest/{docid}')
-  .onCreate((snap, context) => {
-      const deviceLimits = {
-          tv: 200,
-          fridge:500,
-          washingmachine:500
-      }
-      const device = snap.data().device;
-      const dataArray = snap.data()[device];
-      const product = snap.data().productId;
-      let count = 0;
-      for (var data in dataArray ){
-        if (dataArray[data]>deviceLimits[device]){
-            count= count + 1;
-        }
-        if(count>5){
-            console.log("count exceeded");
-            const payload = {
-                notification: {
-                  title: `Alert!`,
-                  body: "Your " + device + " is indicating an abnormal power consumption. Please check.",
-                  click_action: "https://elecmoni.web.app"
-                }
+// exports.sendNotifications = functions.firestore
+//   .document('powerDataTest/{docid}')
+//   .onCreate((snap, context) => {
+//       const deviceLimits = {
+//           tv: 200,
+//           fridge:500,
+//           washingmachine:500
+//       }
+//       const device = snap.data().device;
+//       const dataArray = snap.data()[device];
+//       const product = snap.data().productId;
+//       let count = 0;
+//       for (var data in dataArray ){
+//         if (dataArray[data]>deviceLimits[device]){
+//             count= count + 1;
+//         }
+//         if(count>5){
+//             console.log("count exceeded");
+//             const payload = {
+//                 notification: {
+//                   title: `Alert!`,
+//                   body: "Your " + device + " is indicating an abnormal power consumption. Please check.",
+//                   click_action: "https://elecmoni.web.app"
+//                 }
 
-              };
-            return admin.firestore().collection("userDetails").where("productId","==",product).get()
-            .then(querSnapshot=>{
-                if(!querSnapshot.empty){
+//               };
+//             return admin.firestore().collection("userDetails").where("productId","==",product).get()
+//             .then(querSnapshot=>{
+//                 if(!querSnapshot.empty){
                     
-                    if(querSnapshot.docs[0].data().token !== ""){
-                        var token = [];
-                        token.push(querSnapshot.docs[0].data().token);
-                        return admin.messaging().sendToDevice(token,payload)
-                        .then((response)=>{
-                            console.log("response");
-                            return response;})
-                        .catch((err)=>{
-                            console.log("Error sending notification");
-                            console.log(err);
-                    })
-                    }
-                }
-                return null;
-            })
-            .catch((err)=>{
-                console.log("Error in getting user info");
-                console.log(err);
-        })
-        }
-      }
+//                     if(querSnapshot.docs[0].data().token !== ""){
+//                         var token = [];
+//                         token.push(querSnapshot.docs[0].data().token);
+//                         return admin.messaging().sendToDevice(token,payload)
+//                         .then((response)=>{
+//                             console.log("response");
+//                             return response;})
+//                         .catch((err)=>{
+//                             console.log("Error sending notification");
+//                             console.log(err);
+//                     })
+//                     }
+//                 }
+//                 return null;
+//             })
+//             .catch((err)=>{
+//                 console.log("Error in getting user info");
+//                 console.log(err);
+//         })
+//         }
+//       }
       
-  });
+//   });
 
 
 //Scheduled function to run at midnight everyday to calculate the power usage of each device in the previous day 
@@ -317,23 +321,23 @@ exports.sendNotifications = functions.firestore
 //     })        
 // });
 
-// //cost free method for calling one ml model at a time 
+//cost free method for calling one ml model at a time 
 // exports.predict = functions.https.onRequest((req, res) => {
 //     // var b = new Array(1000).fill(1)
-//     let data = req.body.samples; 
-//     var input = tf.tensor(data,shape=[1,1000,1],dtype="float32");
-//     //var input = tf.ones([1,1000,1])
+//     //let data = req.body.samples; 
+//     //var input = tf.tensor(data,shape=[1,1000,1],dtype="float32");
+//     var input = tf.ones([1,1000,1])
 //     predict(input)
 //     .then((pred) => {
-//         let user = req.body.user;
-//         var date = new Date(Date.now())
-//         const q = admin.firestore().collection("powerDataTest").add({
-//             tv: Array.from(pred),
-//             timeFrameNo: date,
-//             productId: user
-//         })
+//         // let user = req.body.user;
+//         // var date = new Date(Date.now())
+//         // const q = admin.firestore().collection("powerDataTest").add({
+//         //     tv: Array.from(pred),
+//         //     timeFrameNo: date,
+//         //     productId: user
+//         // })
 //         res.status(200).send("OK");
-//         return(q);
+//         return(Array.from(pred));
 //     })
 //     .catch((error)=>{
 //         console.log("error")
@@ -372,10 +376,10 @@ exports.sendNotifications = functions.firestore
   
 //   async function predict(data) {
 //    let model = await tf.loadLayersModel(
-//       "https://firebasestorage.googleapis.com/v0/b/elecmoni.appspot.com/o/model.json?alt=media&token=40f180a1-432a-4eb0-9a3d-0254f0ff6825"
+//       "https://firebasestorage.googleapis.com/v0/b/elecmoni.appspot.com/o/model.json?alt=media&token=63fa3a5c-2fef-4a1c-884b-d14d4bb17241"
 //     );
 //     //let input = tf.tensor3d(data);
-//     //console.log(input)
+//     console.log(model)
     
 //     //input = input.expandDims(0);
 //     return model.predict(data).dataSync();
@@ -453,6 +457,144 @@ exports.sendNotifications = functions.firestore
 //     })        
 //   })
 
+//   exports.dailyScheduleInfer = functions.pubsub.schedule('05 00 * * *')
+//     .timeZone('Asia/Colombo') // Users can choose timezone - default is America/Los_Angeles
+//     .onRun((context) => {
+//     admin.firestore().collection("issuedProducts").where("active","==", true).get()
+//     .then(querySnapshot => {
+//         var productsList=[];
+//         querySnapshot.forEach(doc => {
+//             // doc.data() is never undefined for query doc snapshots
+//             productsList.push(doc.data().productId)
+//         });
+//         const promises = []
+//         var beginningDate = new Date(Date.now() - 84600000);
+//         var beginningObject = new Date(beginningDate.getFullYear(),beginningDate.getMonth(),beginningDate.getDate());
+//         var endDate = new Date(Date.now());
+//         var endObject = new Date(endDate.getFullYear(),endDate.getMonth(),endDate.getDate())
+//         // var end = new Date(Date.now());
+//         // var beginningObject = new Date(end.getFullYear(), end.getMonth(), 1);
+//         // var endObject = new Date(end.getFullYear(),end.getMonth(),end.getDate());
+//         for (product in productsList){
+//             const p = admin.firestore().collection("powerDataTest").where("productId","==", productsList[product])
+//                 .where("timeFrameNo",">", beginningObject)
+//                 .where("timeFrameNo", "<=", endObject)
+//                 .get()
+//             promises.push(p)
+//         }        
+//         return Promise.all(promises)
+//     }) 
+//         .then(docSnapshots =>{
+//             const prom=[]
+//             const powerSum=[]
+//             const deviceTypes = ["tv","fridge","washing machine"]
+//             var dateO = new Date(Date.now() - 86400000)
+//             docSnapshots.forEach(docSnapshot => {
+//                 var sum=[0,0,0]
+//                 var productName = "None"
+//                 docSnapshot.forEach(doc => {
+//                     //console.log(doc.data().device)
+//                     for (var device in deviceTypes){
+//                         if(doc.data().device === deviceTypes[device]){
+//                             const docdata = doc.data()[deviceTypes[device]]
+//                             for (i in docdata){
+//                                 sum[device]+= docdata[i]
+//                             }
+//                             break;//Added oct18
+//                         } 
+//                     }
+//                     productName = doc.data().productId
+//                 })
+//                 //powerSum.push({[productName]: {tv: sum[0],fridge: sum[1], washingmachine:sum[2]}})
+//                 //console.log(powerSum)
+//                 const q = admin.firestore().collection("dailyPowerReadings").add({
+//                 productId: productName,
+//                 tv: sum[0],
+//                 fridge: sum[1], 
+//                 washingmachine:sum[2],
+//                 timeStamp:dateO })
+//                 prom.push(q)
+//             })
+//             res.send("OK")
+//             return Promise.all(prom)
+//             // var dateO = new Date(Date.now() - 86400000)
+//             // const q = admin.firestore().collection("dailyPowerReadings").add({
+//             //     data: powerSum,
+//             //     timeStamp: dateO
+//             // })
+//             //res.send("OK")
+//             ///return q
+//         })
+//         .catch((error)=>{
+//             console.log("error")
+//             res.status(500).send(error)
+//     })       
+//   });
+
+//   exports.dailyScheduleAgg = functions.pubsub.schedule('05 00 * * *')
+//   .timeZone('Asia/Colombo') // Users can choose timezone - default is America/Los_Angeles
+//   .onRun((context) => {
+//   admin.firestore().collection("issuedProducts").where("active","==", true).get()
+//   .then(querySnapshot => {
+//       var productsList=[];
+//       querySnapshot.forEach(doc => {
+//           // doc.data() is never undefined for query doc snapshots
+//           productsList.push(doc.data().productId)
+//       });
+//       const promises = []
+//       var beginningDate = new Date(Date.now() - 84600000);
+//       var beginningObject = new Date(beginningDate.getFullYear(),beginningDate.getMonth(),beginningDate.getDate());
+//       var endDate = new Date(Date.now());
+//       var endObject = new Date(endDate.getFullYear(),endDate.getMonth(),endDate.getDate())
+//       // var end = new Date(Date.now());
+//       // var beginningObject = new Date(end.getFullYear(), end.getMonth(), 1);
+//       // var endObject = new Date(end.getFullYear(),end.getMonth(),end.getDate());
+//       for (product in productsList){
+//           const p = admin.firestore().collection("aggregateData").where("productId","==", productsList[product])
+//               .where("timeFrameNo",">", beginningObject)
+//               .where("timeFrameNo", "<=", endObject)
+//               .get()
+//           promises.push(p)
+//       }        
+//       return Promise.all(promises)
+//   }) 
+//       .then(docSnapshots =>{
+//           const prom=[];
+//           var dateO = new Date(Date.now() - 86400000)
+//           docSnapshots.forEach(docSnapshot => {
+//               var sum=[0,0,0];
+//               var productName = "None";
+//               docSnapshot.forEach(doc => {
+//                   //console.log(doc.data().device)                                      
+//                     const docdata = doc.data().data;
+//                     for (i in docdata){
+//                         sum += docdata[i];
+//                     }                  
+//                   productName = doc.data().productId;
+//               })
+              
+//               const q = admin.firestore().collection("dailyAggregateData").add({
+//               productId: productName,
+//               data:sum,
+//               date:dateO })
+//               prom.push(q)
+//           })
+//           res.send("OK")
+//           return Promise.all(prom)
+//           // var dateO = new Date(Date.now() - 86400000)
+//           // const q = admin.firestore().collection("dailyPowerReadings").add({
+//           //     data: powerSum,
+//           //     timeStamp: dateO
+//           // })
+//           //res.send("OK")
+//           ///return q
+//       })
+//       .catch((error)=>{
+//           console.log("error")
+//           res.status(500).send(error)
+//   })       
+// });
+
 //   exports.Monthly = functions.https.onRequest((req, res) => {
 //     admin.firestore().collection("issuedProducts").where("active","==", true).get()
 //     .then(querySnapshot => {
@@ -510,6 +652,118 @@ exports.sendNotifications = functions.firestore
     
 //   });
  
+//   exports.monthlyScheduleInfer = functions.pubsub.schedule('10 00 01 * *')
+//   .timeZone('Asia/Colombo') // Users can choose timezone - default is America/Los_Angeles
+//   .onRun((context) => {
+//     admin.firestore().collection("issuedProducts").where("active","==", true).get()
+//     .then(querySnapshot => {
+//         var productsList=[];
+//         querySnapshot.forEach(doc => {
+//             // doc.data() is never undefined for query doc snapshots
+//             productsList.push(doc.data().productId)
+//         });
+//         const promises = []
+//         var end = new Date(Date.now());
+//         var beginningObject = new Date(end.getFullYear(), end.getMonth()-1, 1);//check oct18
+//         var endObject = new Date(end.getFullYear(),end.getMonth(),end.getDate());
+//         for (product in productsList){
+//             const p = admin.firestore().collection("dailyPowerReadings").where("productId","==", productsList[product])
+//                 .where("timeStamp",">", beginningObject)
+//                 .where("timeStamp", "<=", endObject)
+//                 .get()
+//             promises.push(p)
+//         }        
+//         return Promise.all(promises)
+//     }) 
+//         .then(docSnapshots =>{
+//             const prom=[]
+//             const deviceTypes = ["tv","fridge","washingmachine"]
+//             docSnapshots.forEach(docSnapshot => {
+//                 var sum=[0,0,0]
+//                 var productName = "None"
+//                 docSnapshot.forEach(doc => {
+//                     for (var device in deviceTypes){
+//                         if(doc.data()[deviceTypes[device]]!== undefined){
+//                             sum[device]+= doc.data()[deviceTypes[device]]                            
+//                         } 
+//                     }
+//                     productName = doc.data().productId
+//                 })
+//                 var months = ["Jan","Feb","Mar","April","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
+//                 var end = new Date(Date.now()-43200000);
+//                 var month = months[end.getMonth()];
+//                 const q = admin.firestore().collection("monthlyPowerReadings").add({
+//                 productId: productName,
+//                 tv: sum[0],
+//                 fridge: sum[1], 
+//                 washingmachine:sum[2],
+//                 month:month,
+//                 timeStamp: end })
+//                 prom.push(q)
+//             })
+//             res.send("OK")
+//             return Promise.all(prom)
+//         })
+//         .catch((error)=>{
+//             console.log("error")
+//             res.status(500).send(error)
+//     }) 
+// });
+
+// exports.monthlyScheduleAgg = functions.pubsub.schedule('10 00 01 * *')
+//   .timeZone('Asia/Colombo') // Users can choose timezone - default is America/Los_Angeles
+//   .onRun((context) => {
+//     admin.firestore().collection("issuedProducts").where("active","==", true).get()
+//     .then(querySnapshot => {
+//         var productsList=[];
+//         querySnapshot.forEach(doc => {
+//             // doc.data() is never undefined for query doc snapshots
+//             productsList.push(doc.data().productId)
+//         });
+//         const promises = []
+//         var end = new Date(Date.now());
+//         var beginningObject = new Date(end.getFullYear(), end.getMonth()-1, 1);
+//         var endObject = new Date(end.getFullYear(),end.getMonth(),end.getDate());
+//         for (product in productsList){
+//             const p = admin.firestore().collection("dailyAggregateData").where("productId","==", productsList[product])
+//                 .where("date",">", beginningObject)
+//                 .where("date", "<=", endObject)
+//                 .get()
+//             promises.push(p)
+//         }        
+//         return Promise.all(promises)
+//     }) 
+//         .then(docSnapshots =>{
+//             const prom=[]
+//             //const deviceTypes = ["tv","fridge","washingmachine"]
+//             docSnapshots.forEach(docSnapshot => {
+//                 //var sum=[0,0,0]
+//                 var sum = 0;
+//                 var productName = "None"
+//                 docSnapshot.forEach(doc => {                       
+//                     sum+= doc.data().data;                                              
+//                     productName = doc.data().productId
+//                 })
+//                 var months = ["Jan","Feb","Mar","April","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
+//                 var end = new Date(Date.now()-43200000);
+//                 var month = months[end.getMonth()];
+//                 const q = admin.firestore().collection("monthlyAggregateData").add({
+//                 productId: productName,
+//                 data:sum,
+//                 month:month,
+//                 timeStamp: end })
+//                 prom.push(q)
+//             })
+//             res.send("OK")
+//             return Promise.all(prom)
+//         })
+//         .catch((error)=>{
+//             console.log("error")
+//             res.status(500).send(error)
+//     }) 
+// });
+
+
 // exports.monthly = functions.https.onRequest((req, res) => {
 //     admin.firestore().collection("issuedProducts").where("active","==", true).get()
 //     .then(querySnapshot => {

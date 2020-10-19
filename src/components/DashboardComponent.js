@@ -17,6 +17,17 @@ class Dashboard extends Component{
             isVerified:false,
             productDocId: "",
             userDetails: {name: "", email: "", productId:"", address:""},
+            aggregateR:[{
+                labels:[],
+                datasets:[{
+                    label:"Total Power",
+                    fontColor: "#ffffff",
+                    backgroundColor: "rgba(0, 0, 200, 0.3)",
+                    pointBackgroundColor: "rgb(0, 0, 200)",
+                    borderColor:"rgba(0, 0, 200)",
+                    data:[]
+                }]
+                }],
             info: [{
                 labels:[],
                 datasets:[{
@@ -48,6 +59,17 @@ class Dashboard extends Component{
                 }]
                 },
                 ],
+            aggregateM:[{
+                labels:[],
+                datasets:[{
+                    label:"Total Power",
+                    backgroundColor: "rgba(0, 0, 200, 0.3)",
+                pointBackgroundColor: "rgb(0, 0, 200)",
+                borderColor:"rgba(0, 0, 200)",
+                borderWidth: 5,
+                    data:[]
+                }]
+            }],
             barInfo: [{
                 labels:[],
                 datasets:[{
@@ -81,6 +103,18 @@ class Dashboard extends Component{
                     }]
                     },
                 ],
+            aggregateD:[{
+                labels:[],
+                datasets:[{
+                    label:"Total Power",
+                    fontColor: "#ffffff",
+                    backgroundColor: "rgba(0, 0, 200, 0.3)",
+                    pointBackgroundColor: "rgb(0, 0, 200)",
+                    borderColor:"rgba(0, 0, 200)",
+                    borderWidth: 5,
+                    data:[]
+                }]
+                }],
             bubbleInfo: [{
                 labels:[],
                 datasets:[{
@@ -154,6 +188,11 @@ class Dashboard extends Component{
             thisMonth: "Calculating..",
             thisMonthDup: 0,
             thisWeekDup: 0,
+            todayAgg: "Calculating..",
+            thisWeekAgg: "Calculating..",
+            thisMonthAgg: "Calculating..",
+            thisMonthDupAgg: 0,
+            thisWeekDupAgg: 0,
             uptoNow : [],
             dataUptoNow:[],
             uptoMonth: [],
@@ -352,6 +391,9 @@ class Dashboard extends Component{
                     this.setState({
                         uptoNow:[],
                     })
+                    this.readAggregateData();
+                    this.readAggregateDaily();
+                    this.readAggregateMonthly();
                     this.readDataRealTimeDevByDev("tv",0);
                     this.readDataRealTimeDevByDev("fridge",1);
                     this.readDataRealTimeDevByDev("washingmachine",2);                  
@@ -433,6 +475,218 @@ class Dashboard extends Component{
         document.getElementById('unsubscribe').setAttribute("disabled",true);
 
         }
+    }
+    
+    readAggregateData(){
+        var product = this.state.userDetails.productId;
+        var now = new Date(Date.now());
+        var firstDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        this.houseRef = firestore.collection('aggregateData').where("productId","==", product).where("timeFrameNo",">=",firstDay).orderBy("timeFrameNo").onSnapshot(
+            (querySnapshot)=>{
+                var sumNow = 0;
+                var XVal=1;
+                this.state.aggregateR[0].labels=[];
+                this.state.aggregateR[0].datasets[0].data=[];
+                for (var i in querySnapshot.docs) {
+                    const doc = querySnapshot.docs[i];
+                    const time = (doc.data().timeFrameNo.seconds)*1000;
+                    const YVal = doc.data().data;
+                    for (var j in YVal) {
+                        this.state.aggregateR[0].labels.push(new Date(time + (XVal-1)*3000));
+                        //console.log(new Date(time + (XVal-1)*3));
+                        this.state.aggregateR[0].datasets[0].data.push(YVal[j]);
+                        sumNow=sumNow+YVal[j];
+                        XVal=XVal+1;
+                }                      
+                }
+                //console.log(this.state.info[device])
+            ReactDOM.render(<Line  options= {
+                {
+                    
+                    responsive:true,
+                    legend: {
+                        display: true,
+                        labels: {
+                            fontColor: '#ffffff',
+                            fontSize: 20
+                        }
+                    },
+                
+                    scales: {
+                        yAxes: [{
+                            ticks: {
+                                beginAtZero: true,
+                                fontColor: "#ffffff"
+                            }
+                        }],
+                        
+                        xAxes:[{ 
+                            type:"time",
+                            distribution: "linear",
+                            time:{
+                                displayFormats:{
+                                    millisecond: "mm:ss:SSS"
+                                }
+                            },
+                            // time: {
+                            //     parser: 'MM/DD/YYYY HH:mm',
+                            //     // round: 'day'
+                            //     tooltipFormat: 'll HH:mm'
+                            // },
+                            ticks: {
+                                //beginAtZero: true,
+                                fontColor: "#ffffff",
+                                //stepSize:100
+                            },
+                            scaleLabel: {
+                                display: true,
+                                labelString: "Time",
+                                fontColor: "#ffffff",
+                                // stepSize: 100,
+                            }
+                        }]}}
+            }
+                data={this.state.aggregateR[0]}></Line>, document.getElementById('graphsagg'));
+            //console.log("here");
+            
+            this.setState({
+                todayAgg: Math.round(sumNow),
+                thisMonthAgg: this.state.thisMonthDupAgg + Math.round(sumNow),
+                thisWeekAgg: this.state.thisWeekDupAgg + Math.round(sumNow),
+            })
+            
+            }) 
+    }
+
+    readAggregateDaily(){
+        var productI = this.state.userDetails.productId;
+        var months = ["Jan","Feb","Mar","April","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
+        var end = new Date(Date.now());
+        var month = end.getMonth();
+        var firstDay = new Date(end.getFullYear(), end.getMonth(), 1);
+        var endObj = new Date(end.getFullYear(),end.getMonth(),end.getDate());
+        var weekBefore = new Date(end.getFullYear(), end.getMonth(),end.getDate()-7);
+        var dataUptoMonth = []
+
+        firestore.collection('dailyAggregateData').where("productId","==",productI).where("date",">=",firstDay)
+        .where("date","<", endObj).orderBy("date").get()
+        .then(
+        (querySnapshot)=>{
+            var sum = 0;
+            var sumWeek = 0;
+            this.state.aggregateD[0].datasets[0].data=[];
+            for (var i in querySnapshot.docs) {
+                const doc = querySnapshot.docs[i];
+                const YVal = doc.data().data;
+                const Obj = {
+                    x: doc.data().date.toDate().getDate(),
+                    y:YVal,
+                    r:15
+                }
+                if (doc.data().date.toDate() >= weekBefore){
+                    sumWeek += YVal;
+                    console.log("thisweek")
+                }
+                
+                //this.state.barInfo[device].labels.push( months[month] + doc.data().timeStamp.toDate().getDate());
+                //this.state.barInfo[device].datasets[0].data.push(YVal);
+                this.state.aggregateD[0].datasets[0].data.push(Obj);
+                sum=sum+YVal;               
+            }
+            this.state.aggregateD[0].datasets[0].label = this.state.aggregateD[0].datasets[0].label +"-"+ months[month];
+            
+            ReactDOM.render(<Bubble options= {
+                {
+                    legend: {
+                        display: true,
+                        labels: {
+                            fontColor: '#ffffff',
+                            fontSize: 20
+                        }
+                    },scales: {
+                        yAxes: [{
+                            ticks: {
+                                beginAtZero: true,
+                                fontColor: "#ffffff"
+                            }
+                        }],
+                        xAxes:[{
+                            ticks: {
+                                beginAtZero: true,
+                                fontColor: "#ffffff",
+                                stepSize:1
+                            },
+                            scaleLabel: {
+                                display: true,
+                                labelString: "Day",
+                                fontColor: "#ffffff",
+                            }
+                        }]}}
+            } data={this.state.aggregateD[0]}></Bubble>, document.getElementById('barsagg')); 
+            this.setState({
+                thisMonthAgg: Math.round(sum+this.state.todayAgg),
+                thisMonthDupAgg: Math.round(sum),
+                thisWeekAgg: Math.round(sumWeek +this.state.todayAgg),
+                thisWeekDupAgg: Math.round(sumWeek),
+            }) 
+        
+        
+        })
+    }
+
+    readAggregateMonthly(){
+        var product = this.state.userDetails.productId;
+        var now = new Date(Date.now());
+        var firstDayOfYear = new Date(now.getFullYear(),1,1);
+        firestore.collection("monthlyAggregateData").where("productId","==",product).where("timeStamp",">",firstDayOfYear)
+        .where("timeStamp","<=",now).orderBy("timeStamp")
+        .get()
+        .then(querySnapshot=>{
+            
+                this.state.aggregateM[0].datasets[0].data=[];
+                this.state.aggregateM[0].labels=[];
+                for (var i in querySnapshot.docs) {
+                    const doc = querySnapshot.docs[i];
+                    const YVal = doc.data().data;
+                    const XVal = doc.data().month
+                    if(YVal!==undefined & XVal!==undefined){
+                        this.state.aggregateM[0].datasets[0].data.push(YVal);
+                        this.state.aggregateM[0].labels.push(XVal);
+                    }                  
+            }
+            //console.log(this.state.barInfo[pro].datasets[0].data)
+            ReactDOM.render(<Bar options= {
+                {   layout:{
+                    padding:{
+                        left:10,
+                        right:10,
+                        top: 10,
+                        bottom:10
+                    }
+                },
+                    legend: {
+                        display: true,
+                        labels: {
+                            fontColor: '#ffffff',
+                            fontSize: 20
+                        }
+                    },scales: {
+                        yAxes: [{
+                            ticks: {
+                                beginAtZero: true,
+                                fontColor: "#ffffff"
+                            }
+                        }],
+                        xAxes:[{
+                            ticks: {
+                                beginAtZero: true,
+                                fontColor: "#ffffff"
+                            }
+                        }]}}
+            } data={this.state.aggregateM[0]}></Bar>, document.getElementById('bubbleagg')); 
+                
+        
+        })
     }
 
 //realtime listener function to capture power usage of devices real time
@@ -1003,10 +1257,102 @@ class Dashboard extends Component{
                             </div>
                         </div>
                         <div className="col-12 col-md-9 align-self-start">
-                            <div className="container">
+                        <div className="container">
                                 <Card>
                                 <CardBody>
-                                <CardTitle style={{fontSize:"30px", color:"#000000"}}>Upto Now - Total Power Consumption</CardTitle>
+                                <CardTitle style={{fontSize:"28px", color:"#000000"}}>Total Power Consumption</CardTitle>
+                                <div className="row">
+                                <div className="col-md-4">
+                                <div className="card-counter primary">
+                                    <i className="fa fa-clock-o"></i>
+                                    <span className="count-name">Today</span>
+                                <span className="count-numbers">{this.state.todayAgg}</span>
+                                    
+                                </div>
+                                </div>
+
+                                <div className="col-md-4">
+                                <div className="card-counter danger">
+                                    <i className="fa fa-calendar"></i>
+                                <span className="count-numbers">{this.state.thisWeekAgg}</span>
+                                    <span className="count-name">Last 7 days</span>
+                                </div>
+                                </div>
+
+                                <div className="col-md-4">
+                                <div className="card-counter success">
+                                    <i className="fa fa-area-chart"></i>
+                                <span className="count-numbers">{this.state.thisMonthAgg}</span>
+                                    <span className="count-name">Current billing period</span>
+                                </div>
+                                </div>
+                               
+
+                            </div>
+                            </CardBody>
+                            </Card>
+                            </div>
+                            <div className="container mt-4">
+                            <Card>
+                            <CardBody>
+                            <CardTitle style={{fontSize:"30px", color:"#000000"}}>Total Power Usage - In detail</CardTitle>
+                            <Tabs defaultActiveKey="now" id="uncontrolled-tab-example" className="tab-topic" >
+                                <Tab eventKey="now" title="Current" className="tab-item">
+                                    <div id="notify">
+                                    </div>
+                            
+                                    <br></br><br></br>
+                                    
+                                    <div className="row">
+                                    <div className="col-12 col-md-2"></div>
+                                    <div className="col-12 col-md-8" id='graphsagg' style={{position: "relative", backgroundColor:"#152238", borderRadius:"10px"}}>
+                                    </div>
+                                    </div>
+                                    
+                                    <br></br><br></br>
+                                    
+
+            
+                                </Tab>
+                                <Tab eventKey="daily" title="Daily" className="tab-item ">
+                                    <div id="notifyD">
+                                    </div>
+                                    <br></br><br></br>
+                                    
+                                    <div className="row">
+                                    <div className="col-12 col-md-1"></div>
+                                    <div className="col-12 col-md-8" id='barsagg' style={{position: "relative", backgroundColor:"#152238", borderRadius:"10px"}}>
+                                    </div>
+                                    </div>
+                                    
+                                    <br></br><br></br>
+                                    
+                                   
+                                </Tab>
+                                <Tab eventKey="monthly" title="Monthly" className="tab-item">
+                                <div id="notifyM">
+                                    </div>
+                            
+                                    <br></br><br></br>
+                                    
+                                    <div className="row">
+                                    <div className="col-12 col-md-2"></div>
+                                    <div className="col-12 col-md-8" id='bubbleagg' style={{position: "relative", backgroundColor:"#152238", borderRadius:"10px"}}>
+                                    </div>
+                                    </div>
+                                    
+                                    <br></br><br></br>
+                                </Tab>
+                            </Tabs>
+                            </CardBody>
+                            </Card>
+                            </div>
+                            
+                            
+                            <div className="container mt-4">
+                                <Card>
+                                <CardBody>
+                                <CardTitle style={{fontSize:"28px", color:"#000000"}}>Power Consumption of High Power Consuming Devices</CardTitle>
                                 <div className="row">
                                 <div className="col-md-4">
                                 <div className="card-counter primary">

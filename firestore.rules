@@ -10,8 +10,46 @@ service cloud.firestore {
     //
     // Make sure to write security rules for your app before that time, or else
     // your app will lose access to your Firestore database
-    match /{document=**} {
-      allow read, write: if request.time < timestamp.date(2020, 9, 8);
+    // match /{document=**} {
+    //   allow read, write: if request.time < timestamp.date(2020,11,20);
+    // }
+    // 
+    // should be published after checking
+    match /powerDataTest/{powerDataTest} {
+    	allow read: if isLoggedIn();
+      allow create, update, delete: if false;
     }
+    match /dailyPowerReadings/{dailyPowerReadings} {
+    	allow read: if isLoggedIn();
+      allow create, update, delete: if false;
+    }
+     match /monthlyPowerReadings/{monthlyPowerReadings} {
+    	allow read: if isLoggedIn();
+      allow create, update, delete: if false;
+    }
+     match /issuedProducts/{issuedProducts} {
+    	allow read, update: if isLoggedIn();
+      allow create, delete: if false;
+    }
+     match /userDetails/{userDetails} {
+    	allow read, update: if isLoggedIn();
+      allow create, delete: if false;
+    }
+    match /aggregateData/{aggregateData} {
+    	allow read: if isLoggedIn();
+      allow create, update, delete: if false;
+    }
+    match /dailyAggregateData/{dailyAggregateData} {
+    	allow read: if isLoggedIn();
+      allow create, update, delete: if false;
+    }
+    match /monthlyAggregateData/{monthlyAggregateData} {
+    	allow read: if isLoggedIn();
+      allow create, update, delete: if false;
+    }
+  }
+  
+  function isLoggedIn(){
+  	return request.auth!=null;
   }
 }
