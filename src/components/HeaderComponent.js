@@ -120,19 +120,18 @@ class Header extends Component{
         };
 
         return(
-                <React.Fragment>
-                    <Navbar className="header navbar-expand-md navbar-dark" style={{zIndex:10}}>
+            <React.Fragment>
+                    <Navbar className="header navbar-expand navbar-dark" style={{zIndex:10}}>
                             <div className = 'container' >
                                 <NavbarToggler onClick={this.toggleNav}/>
-                                    <NavbarBrand className="mr-auto" href="/home"    style={{position: 'absolute',  left: '40px'}}> 
-                                        <img src="assets/images/logo_white.png" height="80" width="80" alt="EnDis"></img>
-                                    </NavbarBrand>
-                                    <div style={{position: 'absolute',  right: '40px'}}>
-                                    <Collapse isOpen= {this.state.isNavOpen} navbar>
-                                        <Nav className="ml-auto" navbar>
-                                            <NavItem>
-                                                { !this.props.auth.isAuthenticated ?
-                                                    <div>
+                                <NavbarBrand href="/home"    style={{position: 'absolute',  left: '0%'}}> 
+                                    <img src="assets/images/logo_white.png" width="15%" alt="EnDis"></img>
+                                </NavbarBrand>
+                                <Collapse navbar isOpen={this.state.isNavOpen} style={{position: 'absolute',  right: '2%', bottom:'20%'}}>
+                                    <Nav>
+                                        <NavItem>
+                                            { !this.props.auth.isAuthenticated ?
+                                                <div>
                                                     <Button outline onClick={this.toggleModalLogin} style={{marginRight:10}}>
                                                         <span className="fa fa-sign-in fa-lg"></span> Sign in
                                                         {this.props.auth.isFetching ?
@@ -147,10 +146,9 @@ class Header extends Component{
                                                         : null
                                                     }
                                                     </Button>
-                                                    </div>
-                                                    :
-                                                    <div>
-                                                    
+                                                </div>
+                                                :
+                                                <div>
                                                     <Button outline onClick={this.handleLogout} style={{marginRight:10}}>
                                                         <span className="fa fa-sign-out fa-lg"></span> Logout
                                                         {this.props.auth.isFetching ?
@@ -163,14 +161,12 @@ class Header extends Component{
                                                             <span className="fa fa-line-chart fa-lg"></span> Dashboard
                                                         </NavLink>
                                                     </Button>
-                                            
-                                                    </div>
-                                                }
-                                            </NavItem>
+                                                </div>
+                                            }
+                                        </NavItem>
                                     </Nav>
-                                    </Collapse>
-                                    </div>
-                               
+                                </Collapse>
+                                
                             </div>
                     </Navbar>
 

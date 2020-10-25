@@ -1184,81 +1184,80 @@ class Dashboard extends Component{
         return(
                 <div className="dashboard">
                     <div className="row">
-                        <div className="col-12 col-md-2 mr-5" style={{width:"100%", height:"100%"}}> 
+                        <div className="col-12 col-md-2 mr-5 mb-4" style={{width:"100%", height:"100%"}}> 
                             <div className="column">
-                            <Card style={{backgroundColor:"#ffffff", color:'#000000'}}>
-                                <CardBody className="text-center">
-                                    <CardImg src="assets/images/ppic.png" alt="" className="img-fluid mb-3"/>  
-                                    <CardTitle className="text-center" >{this.state.userDetails.name}</CardTitle> 
-                                    <ListGroup  variant="flush" style={{fontSize:15, color:'#000000',backgroundColor:"#808080"}}>
-                                        <ListGroupItem className= "listgroupitem">Email: {auth.currentUser.email}</ListGroupItem>
-                                        <ListGroupItem className= "listgroupitem">Product Id: {this.state.userDetails.productId}</ListGroupItem>
-                                        <ListGroupItem className= "listgroupitem">Address: {this.state.userDetails.address}</ListGroupItem>
-                                     </ListGroup>
-                                    <Button color="warning" className="mt-2" onClick={this.toggleModalUpdate}>
-                                     Change bio
-                                    </Button>
-                                </CardBody>
-                                <Modal isOpen = {this.state.isUpdateOpen} toggle={this.toggleModalUpdate}>
-                                <ModalHeader toggle={this.toggleModalUpdate}>Update Profile</ModalHeader>
-                                <ModalBody>
-                                {this.state.userDetails.productId === "" ? 
-                                    <Form onSubmit={this.updateProfile}>                                    
-                                        <FormGroup >
-                                            <Label htmlFor="productid">Product ID</Label>
-                                            <Input type="text" id="productid" name="productid" disabled={this.state.isVerified}
-                                            innerRef = {(input) => this.productid = input} /> 
-                                        </FormGroup>                                    
-                                        <Button className="primary" disabled={this.state.isVerified}
-                                        onClick={this.handleVerify}>Verify</Button>     
-                                        <FormGroup>
-                                            <Label htmlFor="firstname">Name</Label>
-                                            <Input type="text" id="firstname" name="firstname" disabled={!this.state.isVerified }
-                                            innerRef = {(input) => this.firstname = input} />       
-                                        </FormGroup>
-                                        <FormGroup>
-                                            <Label htmlFor="address"> Address </Label>
-                                            <Input type="text" id="address" name="address" disabled={!this.state.isVerified}
-                                            innerRef = {(input) => this.address = input} />       
-                                        </FormGroup>
-                                        <Button type="submit" value="submit" className="primary" disabled={!this.state.isVerified}>Update</Button>                
-                                    </Form> : 
-                                    <Form onSubmit={this.updateProfile}>                                       
-                                        <FormGroup>
-                                            <Label htmlFor="firstname">Name</Label>
-                                            <Input type="text" id="firstname" name="firstname" 
-                                            innerRef = {(input) => this.firstname = input} />       
-                                        </FormGroup>
-                                        <FormGroup>
-                                            <Label htmlFor="address"> Address </Label>
-                                            <Input type="text" id="address" name="address" 
-                                            innerRef = {(input) => this.address = input} />       
-                                        </FormGroup>
-                                        <Button type="submit" value="submit" className="primary" >Update</Button>                
-                                    </Form>
-                                    }
-                                </ModalBody>
-                                </Modal>
-                            </Card>
-                            <Card style={{backgroundColor:"#ffffff", color:'#000000'}} className="mt-3">
-                                <CardBody className="text-center">
-                                    <CardImg src="assets/images/ppic.png" alt="" className="img-fluid mb-3"/>  
-                                    <CardTitle className="text-center" >Enable Notifications</CardTitle> 
-                                    <CardSubtitle className="text-center listgroupitem">If you wanna recieve messages on any abnormalities in your power consumption, click the button below and subscribe to our service</CardSubtitle>                                  
-                                    <Button color="danger" className="mt-2" onClick={this.handleSubscribe} id="subscribe">
-                                     Subscribe
-                                    </Button>
-                                    <Button color="secondary" className="mt-2" onClick={this.handleUnSubscribe} id="unsubscribe" hidden>
-                                     Unsubscribe
-                                    </Button>
-                                </CardBody>
+                                <Card style={{backgroundColor:"#323232", color:'#000000'}}>
+                                    <CardBody className="text-center">
+                                        <CardImg src="assets/images/ppic.png" alt="" className="img-fluid mb-3"/>  
+                                        <CardTitle className="text-center" style={{fontSize:18, color:'#ffffff'}}>{this.state.userDetails.name}</CardTitle> 
+                                        <ListGroup  variant="flush" style={{fontSize:15, color:'#000000',backgroundColor:"#808080"}}>
+                                            <ListGroupItem className= "listgroupitem">Email: {auth.currentUser.email}</ListGroupItem>
+                                            <ListGroupItem className= "listgroupitem">Product Id: {this.state.userDetails.productId}</ListGroupItem>
+                                            <ListGroupItem className= "listgroupitem">Address: {this.state.userDetails.address}</ListGroupItem>
+                                        </ListGroup>
+                                        <Button color="warning" className="mt-2" onClick={this.toggleModalUpdate}>
+                                        Change bio
+                                        </Button>
+                                    </CardBody>
+                                    <Modal isOpen = {this.state.isUpdateOpen} toggle={this.toggleModalUpdate}>
+                                    <ModalHeader toggle={this.toggleModalUpdate}>Update Profile</ModalHeader>
+                                    <ModalBody>
+                                    {this.state.userDetails.productId === "" ? 
+                                        <Form onSubmit={this.updateProfile}>                                    
+                                            <FormGroup >
+                                                <Label htmlFor="productid">Product ID</Label>
+                                                <Input type="text" id="productid" name="productid" disabled={this.state.isVerified}
+                                                innerRef = {(input) => this.productid = input} /> 
+                                            </FormGroup>                                    
+                                            <Button className="primary" disabled={this.state.isVerified}
+                                            onClick={this.handleVerify}>Verify</Button>     
+                                            <FormGroup>
+                                                <Label htmlFor="firstname">Name</Label>
+                                                <Input type="text" id="firstname" name="firstname" disabled={!this.state.isVerified }
+                                                innerRef = {(input) => this.firstname = input} />       
+                                            </FormGroup>
+                                            <FormGroup>
+                                                <Label htmlFor="address"> Address </Label>
+                                                <Input type="text" id="address" name="address" disabled={!this.state.isVerified}
+                                                innerRef = {(input) => this.address = input} />       
+                                            </FormGroup>
+                                            <Button type="submit" value="submit" className="primary" disabled={!this.state.isVerified}>Update</Button>                
+                                        </Form> : 
+                                        <Form onSubmit={this.updateProfile}>                                       
+                                            <FormGroup>
+                                                <Label htmlFor="firstname">Name</Label>
+                                                <Input type="text" id="firstname" name="firstname" 
+                                                innerRef = {(input) => this.firstname = input} />       
+                                            </FormGroup>
+                                            <FormGroup>
+                                                <Label htmlFor="address"> Address </Label>
+                                                <Input type="text" id="address" name="address" 
+                                                innerRef = {(input) => this.address = input} />       
+                                            </FormGroup>
+                                            <Button type="submit" value="submit" className="primary" >Update</Button>                
+                                        </Form>
+                                        }
+                                    </ModalBody>
+                                    </Modal>
                                 </Card>
-
+                                <Card style={{backgroundColor:"#323232", color:'#000000'}} className="mt-3">
+                                    <CardBody className="text-center">
+                                        <CardImg src="assets/images/ppic.png" alt="" className="img-fluid mb-3"/>  
+                                        <CardTitle className="text-center" style={{fontSize:18, color:'#ffffff'}}>Enable Notifications</CardTitle> 
+                                        <CardSubtitle className="text-center listgroupitem">If you wanna recieve messages on any abnormalities in your power consumption, click the button below and subscribe to our service</CardSubtitle>                                  
+                                        <Button color="danger" className="mt-2" onClick={this.handleSubscribe} id="subscribe">
+                                        Subscribe
+                                        </Button>
+                                        <Button color="secondary" className="mt-2" onClick={this.handleUnSubscribe} id="unsubscribe" hidden>
+                                        Unsubscribe
+                                        </Button>
+                                    </CardBody>
+                                </Card>
                             </div>
                         </div>
                         <div className="col-12 col-md-9 align-self-start">
                         <div className="container">
-                                <Card>
+                                <Card style={{backgroundColor:"#646464", color:'#000000'}}>
                                 <CardBody>
                                 <CardTitle style={{fontSize:"28px", color:"#000000"}}>Total Power Consumption</CardTitle>
                                 <div className="row">
@@ -1350,7 +1349,7 @@ class Dashboard extends Component{
                             
                             
                             <div className="container mt-4">
-                                <Card>
+                                <Card style={{backgroundColor:"#646464", color:'#000000'}}>
                                 <CardBody>
                                 <CardTitle style={{fontSize:"28px", color:"#000000"}}>Power Consumption of High Power Consuming Devices</CardTitle>
                                 <div className="row">
@@ -1386,7 +1385,7 @@ class Dashboard extends Component{
                             </div>
 
                             <div className="container mt-4">
-                                <Card>
+                                <Card style={{backgroundColor:"#646464", color:'#000000'}}>
                                     <CardBody>
                                     <CardTitle style={{fontSize:"30px", color:"#000000"}}>Leading Power Consumers</CardTitle>
                                     <Tabs defaultActiveKey="now" id="uncontrolled-tab-example" className="tab-topic" >

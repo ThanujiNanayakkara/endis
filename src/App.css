@@ -1,4 +1,3 @@
-
 .row-header{
   margin:0px auto;
   padding:0px auto;
@@ -15,37 +14,66 @@
   padding: 0px 0px 0px 0px;
 }
 
-.footer{
-  height:75px;
-  font-family: 'Times New Roman', Times, serif;
-  font-size: 1.25em;
+
+html{
+  background-color: black;
+}
+
+.home{
+  min-height: 100vh;
   background-color: #000000;
-  margin:0px auto;
-  padding: 20px 0px 10px 0px;
+  padding: 5vw 10vw 20px 10vw;
+  color: #04724d;
+}
+
+.home-image {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .header{
   position:fixed;
-  width: 100vw;
+  width: 100%;
   height:75px;
-  background-color: rgba(0,0,0,0.4);
-  margin:0px auto;
+  background-color: rgba(50, 50, 50, 0.7);
+  margin:0px 0px 0px 0px;
   padding: 20px 0px 20px 0px;
- 
+}
+
+.footer{
+  position: relative;
+  width: 100vw;
+  font-size: 1.1em;
+  background-color: #04724d;
+  margin:0px 0px 0px 0px;
+  padding: 10px 0px 10px 0px;
+}
+
+.footer-links{
+  color: #000000;
+}
+
+.footer-links:hover{
+  color: #ffffff;
 }
 
 .post-about{
-  background-color:rgba(105, 105, 105, 0.8);
-  border-color: #000000;
+  background-color:rgba(20, 20, 20);
+}
+
+.card{
+  border: 0;
 }
 
 .card-shadow{
-   box-shadow: 10px 10px 5px rgb(51, 51, 51);
+   box-shadow: 10px 10px 5px rgb(100, 100, 100);
 }
+
 .card-contact{
-  width:250px; 
-  background-color:rgba(0,0,0,0.4);
-  
+  background-color:rgba(30, 30, 30);
+  color: #ffffff;
 }
 
 .card-horizontal {
@@ -60,68 +88,42 @@
 }
 
 .btn-social-icon{
-  padding-right:75px;
-  padding-right:75px;
+  padding-left:5vw;
+  padding-right:5vw;
 }
 
 .card-contact:hover{
-  width:250px; 
-  background-color:rgba(56, 56, 56, 0.4);
+  background-color:rgba(50, 50, 50);
   
 }
 
-html{
-  background-color: black;
-}
-
-.home{
-  background-image: url("/assets/images/home_bulbs.jpg"); 
-  background-color: black;
-  background-repeat: no-repeat;
-  background-size: cover;
-  height: 645px;
-  background-position:center;
-  padding: 10vw 20px 20px 10vw;
-  color: #ffffff;
-}
-
 .dashboard{
-  background-color: rgb(63, 63, 63);
- 
+  background-color: rgb(0,0,0);
   padding: 100px 10px 20px 25px;
   color: #000000;
 }
 
 .about-top{
-  background-image: url("/assets/images/about_trees.jpg"); 
   background-color: black;
-  background-repeat: no-repeat;
-  background-size: cover;
-  height: 350px;
-  background-position:bottom;
-  padding: 100px 200px 20px 200px;
-  color: #ffffff;
+  padding: 75px 10vw 2vw 10vw;
+  color: #04724d;
 }
 
 .about-bottom{
-  background-color: rgb(92, 92, 92);
-  padding: 20px 200px 20px 200px;
-  color: #ffffff;
+  background-color: black;
+  padding: 1vw 10vw 5vw 10vw;
+  color: #04724d;
+}
+
+.body{
+  width: 100vw;
 }
 
 .contact{
-  background-image: url("/assets/images/contact_laptop.jpg"); 
   background-color: black;
-  background-repeat: no-repeat;
-  background-size: cover;
-  height: 645px;
-  background-position:center;
-  padding: 100px 200px 20px 200px;
-  color: #ffffff;
-}
-
-.footer-links{
-  color: #ffffff;
+  min-height: 100vh;
+  padding: 75px 10vw 2vw 10vw;
+  color: #04724d;
 }
 
 .jumbotron {

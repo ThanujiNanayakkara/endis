@@ -10,7 +10,7 @@ class Contact extends Component{
         return(
             <div className="contact">
                 <div className="row justify-content-center">
-                    <div className="col-12" style={{textAlign:'center'}}>
+                    <div className="col-12 text-center">
                         <h2>Contact Us</h2><br></br>
                         <p>If you have any doubts regarding the product, please don't be hesitant to contact us.</p>
                     </div>
@@ -18,7 +18,7 @@ class Contact extends Component{
                 <br></br>
 
                 <div className="row justify-content-center">
-                    <a className="footer-links col-4 d-flex justify-content-center" href="tel:+85212345678">
+                    <a className="footer-links col-md-3 col-12 d-flex justify-content-center mt-5" href="tel:+85212345678">
                         <div className="card card-contact">
                             <img className="card-img-top " src="assets/images/phone_white.png" alt="Card image" />
                             <div className="card-body text-center">
@@ -26,7 +26,7 @@ class Contact extends Component{
                             </div>
                         </div>
                     </a>
-                    <a className="footer-links col-4 d-flex justify-content-center" href="mailto:confusion@food.net" >
+                    <a className="footer-links col-md-3 col-12 d-flex justify-content-center mt-5" href="mailto:confusion@food.net" >
                         <div className="card card-contact">
                             <img className="card-img-top " src="assets/images/email_white.png" alt="Card image" />
                             <div className="card-body text-center">
@@ -34,7 +34,7 @@ class Contact extends Component{
                             </div>
                         </div>
                     </a>
-                    <a className="footer-links col-4 d-flex justify-content-center" href="https://g.page/moratuwauni?share">
+                    <a className="footer-links col-md-3 col-12 d-flex justify-content-center mt-5" href="https://g.page/moratuwauni?share">
                         <div className="card card-contact">
                             <img className="card-img-top " src="assets/images/location_white.png" alt="Card image" />
                             <div className="card-body text-center">
@@ -48,16 +48,16 @@ class Contact extends Component{
                 </div>
                 <br></br>
                 <div className="row d-flex justify-content-center">
-                    <div className="col-1 d-flex justify-content-center">
+                    <div className="col-2 d-flex justify-content-center">
                         <a className="btn btn-social-icon btn-google" href="http://google.com/+"><i className="fa fa-google-plus"></i></a>
                     </div>
-                    <div className="col-1 d-flex justify-content-center">
+                    <div className="col-2 d-flex justify-content-center">
                         <a className="btn btn-social-icon btn-facebook" href="http://www.facebook.com/profile.php?id="><i className="fa fa-facebook"></i></a>
                     </div>
-                    <div className="col-1 d-flex justify-content-center">
+                    <div className="col-2 d-flex justify-content-center">
                         <a className="btn btn-social-icon btn-twitter" href="http://twitter.com/"><i className="fa fa-twitter"></i></a>
                     </div>
-                    <div className="col-1 d-flex justify-content-center">
+                    <div className="col-2 d-flex justify-content-center">
                         <a className="btn btn-social-icon btn-google" href="http://youtube.com/"><i className="fa fa-youtube"></i></a>
                     </div>
                 </div>

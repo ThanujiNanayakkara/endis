@@ -8,21 +8,17 @@ import {NavLink} from 'react-router-dom';
 class Footer extends Component{
     render(){
         return(
-            <div className="footer">
-                <div className="container">
-                    <div className="row justify-content-center">             
-                        <div className="col-4 text-center">
-                            <Link className="footer-links" to="/home">Home</Link>
-                        </div>
+            <div className="row justify-content-center footer">             
+                <div className="col-4 text-center">
+                    <Link className="footer-links" to="/home">Home</Link>
+                </div>
 
-                        <div className="col-4 text-center">
-                            <Link className="footer-links" to="/about">About us</Link>
-                        </div>
+                <div className="col-4 text-center">
+                    <Link className="footer-links" to="/about">About us</Link>
+                </div>
 
-                        <div className="col-4 text-center">
-                            <Link className="footer-links" to="/contact">Contact us</Link>
-                        </div>
-                    </div>
+                <div className="col-4 text-center">
+                    <Link className="footer-links" to="/contact">Contact us</Link>
                 </div>
             </div>
         );
