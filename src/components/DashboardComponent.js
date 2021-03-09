@@ -1,12 +1,15 @@
 import React, {Component} from 'react';
-import { Card, CardImg, CardText, CardBody, CardTitle, CardSubtitle, Button,  Modal, ModalHeader, ModalBody, Form, FormGroup, Input, Label, ListGroup, ListGroupItem } from 'reactstrap';
+import { Card, CardImg, CardBody, CardTitle, CardSubtitle, Button,  Modal, ModalHeader, ModalBody, Form, FormGroup, Input, Label, ListGroup, ListGroupItem } from 'reactstrap';
 import { auth, firestore, messaging } from '../firebase/firebase';
-import {Breadcrumb, BreadcrumbItem} from 'reactstrap';
 
-import {Line, Bar, Bubble, Pie} from 'react-chartjs-2';
+
+import { Pie} from 'react-chartjs-2';
 import Tabs from 'react-bootstrap/Tabs';
 import Tab from 'react-bootstrap/Tab';
 import ReactDOM from 'react-dom';
+import LineChart from './LineChartComponent';
+import BarChart from './BarChartComponent';
+import BubbleChart from './BubbleChartComponent';
 
 
 class Dashboard extends Component{
@@ -17,137 +20,12 @@ class Dashboard extends Component{
             isVerified:false,
             productDocId: "",
             userDetails: {name: "", email: "", productId:"", address:""},
-            aggregateR:[{
-                labels:[],
-                datasets:[{
-                    label:"Total Power",
-                    fontColor: "#ffffff",
-                    backgroundColor: "rgba(0, 0, 200, 0.3)",
-                    pointBackgroundColor: "rgb(0, 0, 200)",
-                    borderColor:"rgba(0, 0, 200)",
-                    data:[]
-                }]
-                }],
-            info: [{
-                labels:[],
-                datasets:[{
-                    label:"Tv",
-                    fontColor: "#ffffff",
-                    backgroundColor: "rgba(0, 0, 200, 0.3)",
-                    pointBackgroundColor: "rgb(0, 0, 200)",
-                    borderColor:"rgba(0, 0, 200)",
-                    data:[]
-                }]
-                },{
-                labels:[],
-                datasets:[{
-                    label:"Fridge",
-                    backgroundColor: "rgba(0, 180, 0, 0.3)",
-                    pointBackgroundColor: "rgb(0, 180, 0)",
-                    borderColor:"rgba(0, 180, 0)",
-                    data:[]
-                }]
-                },{
-                labels:[],
-                datasets:[{
-                    label:"Washing Machine",
-                    backgroundColor: "rgba(200, 0, 0, 0.3)",
-                    pointBackgroundColor: "rgb(200, 0, 0)",
-                    borderColor:"rgba(200, 0, 0)",
-                    
-                    data:[]
-                }]
-                },
-                ],
-            aggregateM:[{
-                labels:[],
-                datasets:[{
-                    label:"Total Power",
-                    backgroundColor: "rgba(0, 0, 200, 0.3)",
-                pointBackgroundColor: "rgb(0, 0, 200)",
-                borderColor:"rgba(0, 0, 200)",
-                borderWidth: 5,
-                    data:[]
-                }]
-            }],
-            barInfo: [{
-                labels:[],
-                datasets:[{
-                    label:"Tv",
-                    backgroundColor: "rgba(0, 0, 200, 0.3)",
-                pointBackgroundColor: "rgb(0, 0, 200)",
-                borderColor:"rgba(0, 0, 200)",
-                borderWidth: 5,
-                    data:[]
-                }]
-            },{
-                labels:[],
-                datasets:[{
-                    label:"Fridge",
-                    backgroundColor: "rgba(0, 180, 0, 0.3)",
-                pointBackgroundColor: "rgb(0, 180, 0)",
-                borderColor:"rgba(0, 180, 0)",
-                borderWidth: 5,
-                    data:[]
-                }]
-                },
-                {
-                    labels:[],
-                    datasets:[{
-                        label:"Washing Machine",
-                        backgroundColor: "rgba(200, 0, 0, 0.3)",
-                pointBackgroundColor: "rgb(200, 0, 0)",
-                borderColor:"rgba(200, 0, 0)",
-                        borderWidth: 5,
-                        data:[]
-                    }]
-                    },
-                ],
-            aggregateD:[{
-                labels:[],
-                datasets:[{
-                    label:"Total Power",
-                    fontColor: "#ffffff",
-                    backgroundColor: "rgba(0, 0, 200, 0.3)",
-                    pointBackgroundColor: "rgb(0, 0, 200)",
-                    borderColor:"rgba(0, 0, 200)",
-                    borderWidth: 5,
-                    data:[]
-                }]
-                }],
-            bubbleInfo: [{
-                labels:[],
-                datasets:[{
-                    label:"Tv",
-                    fontColor: "#ffffff",
-                    backgroundColor: "rgba(0, 0, 200, 0.3)",
-                    pointBackgroundColor: "rgb(0, 0, 200)",
-                    borderColor:"rgba(0, 0, 200)",
-                    borderWidth: 5,
-                    data:[]
-                }]
-                },{
-                labels:[],
-                datasets:[{
-                    label:"Fridge",
-                    backgroundColor: "rgba(0, 180, 0, 0.3)",
-                    pointBackgroundColor: "rgb(0, 180, 0)",
-                    borderColor:"rgba(0, 180, 0)",
-                    borderWidth: 5,
-                    data:[]
-                }]
-                },{
-                labels:[],
-                datasets:[{
-                    label:"Washing Machine",
-                    backgroundColor: "rgba(200, 0, 0, 0.3)",
-                    pointBackgroundColor: "rgb(200, 0, 0)",
-                    borderColor:"rgba(200, 0, 0)",
-                    borderWidth: 5,                    
-                    data:[]
-                }]
-                },
-                ],
+            aggregateR:{labels:[],data:[]},
+            info:[{labels:[],data:[]},{labels:[],data:[]},{labels:[],data:[]}],
+            aggregateD:{labels:[],data:[],label:"Total Power"},
+            bubbleInfo : [{labels:[],data:[],label:"Tv"},{labels:[],data:[],label:"Fridge"},{labels:[],data:[],label:"Washing Machine"}],
+            aggregateM: {labels:[],data:[],label:"Total Power"},
+            barInfo : [{labels:[],data:[],label:"Tv"},{labels:[],data:[],label:"Fridge"},{labels:[],data:[],label:"Washing Machine"}],
             pieInfo: [{
                 labels:[],
                 datasets:[{
@@ -196,17 +74,15 @@ class Dashboard extends Component{
             uptoNow : [],
             dataUptoNow:[],
             uptoMonth: [],
-            leadingConsumers:[0,0,0],
-            leadingConsumersNames:[],
             devices:["Tv","Fridge","Washing Machine"],
             leadingConsumersM: [0,0,0],
             leadingConsumersMNames:[],
-             sort:[],
+            sort:[],
             sortDev :[],
             //new
-            house: '',
-            equipment: '',
-            data:[],
+            // house: '',
+            // equipment: '',
+            // data:[],
                       
         };
         this.updateProfile= this.updateProfile.bind(this);
@@ -218,9 +94,9 @@ class Dashboard extends Component{
         //new
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
+
         this.handleSubscribe = this.handleSubscribe.bind(this);
         this.handleUnSubscribe = this.handleUnSubscribe.bind(this);
-
     }
 //this function runs when edit bio button is clicked
     updateProfile(event){
@@ -291,7 +167,7 @@ class Dashboard extends Component{
     }
 
     componentDidMount(){
-       this.readUserData();
+      this.readUserData();
     }
     
     handleTokenRefresh() {
@@ -357,8 +233,8 @@ class Dashboard extends Component{
 
     //new
     readDB=(house,equipment)=>{
-    var today = new Date();
-        var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
+    //var today = new Date();
+        //var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
         firestore.collection("readings").add({
             time: new Date(Date.now())
         })       
@@ -373,7 +249,7 @@ class Dashboard extends Component{
     readUserData(){
         let user= auth.currentUser;
         var usersRef = firestore.collection("userDetails").doc(user.uid);
-        usersRef.get()
+        usersRef.get()  
         .then(doc => {
             if (doc.exists) {
                 this.setState({
@@ -389,7 +265,10 @@ class Dashboard extends Component{
                   }
                 if(doc.data().productId!==""){
                     this.setState({
-                        uptoNow:[],
+                        uptoNow:[0,0,0],
+                        dataUptoNow:[0,0,0],
+                        
+
                     })
                     this.readAggregateData();
                     this.readAggregateDaily();
@@ -414,55 +293,6 @@ class Dashboard extends Component{
     }
 
     informUser(condition){
-        ReactDOM.render(
-            <div className="mt-3">
-            {condition !== "" ? null :
-            <Card >
-                <CardBody>
-                    <CardTitle className="text-center">
-                        No power data to be shown as product ID is not specified. Please proceed to edit your bio in order to add the product ID.
-                    </CardTitle>
-                </CardBody>
-            </Card>
-            }
-            </div>, document.getElementById('notify'));
-        ReactDOM.render(
-            <div>
-            {condition !== "" ? null :
-            <Card >
-                <CardBody>
-                    <CardTitle className="text-center">
-                        No power data to be shown as product ID is not specified. Please proceed to edit your bio in order to add the product ID.
-                    </CardTitle>
-                </CardBody>
-            </Card>
-            }
-            </div>, document.getElementById('notifyD'));
-            ReactDOM.render(
-                <div>
-                {condition !== "" ? null :
-                <Card >
-                    <CardBody>
-                        <CardTitle className="text-center">
-                            No power data to be shown as product ID is not specified. Please proceed to edit your bio in order to add the product ID.
-                        </CardTitle>
-                    </CardBody>
-                </Card>
-                }
-                </div>, document.getElementById('notifyM')); 
-                ReactDOM.render(
-                    <div>
-                    {condition !== "" ? null :
-                    <Card >
-                        <CardBody>
-                            <CardTitle className="text-center">
-                                No power data to be shown as product ID is not specified. Please proceed to edit your bio in order to add the product ID.
-                            </CardTitle>
-                        </CardBody>
-                    </Card>
-                    }
-                    </div>, document.getElementById('notifyE')); 
-        //console.log(condition);
         if(condition !== "") {
         document.getElementById('buttonBar').removeAttribute("hidden");
         document.getElementById('subscribe').removeAttribute("disabled");
@@ -484,77 +314,45 @@ class Dashboard extends Component{
         this.houseRef = firestore.collection('aggregateData').where("productId","==", product).where("timeFrameNo",">=",firstDay).orderBy("timeFrameNo").onSnapshot(
             (querySnapshot)=>{
                 var sumNow = 0;
-                var XVal=1;
-                this.state.aggregateR[0].labels=[];
-                this.state.aggregateR[0].datasets[0].data=[];
+                //var XVal=1;
+                this.setState(prevstate=>({
+                    aggregateR: {
+                        ...prevstate.aggregateR,
+                        labels:[],
+                        data:[]
+                    }
+                }))
+                // this.state.aggregateR.labels=[];
+                // this.state.aggregateR.data=[];
                 for (var i in querySnapshot.docs) {
                     const doc = querySnapshot.docs[i];
                     const time = (doc.data().timeFrameNo.seconds)*1000;
                     const YVal = doc.data().data;
+                    const labels=[];
+                    const data=[];
                     for (var j in YVal) {
-                        this.state.aggregateR[0].labels.push(new Date(time + (XVal-1)*3000));
-                        //console.log(new Date(time + (XVal-1)*3));
-                        this.state.aggregateR[0].datasets[0].data.push(YVal[j]);
+                        labels.push(new Date(time + (j)*3000));
+                        data.push(YVal[j]);
                         sumNow=sumNow+YVal[j];
-                        XVal=XVal+1;
-                }                      
+                        //XVal=XVal+1;
+                } 
+                this.setState(state => {
+                    const l = state.aggregateR.labels.concat(labels);
+                    const d = state.aggregateR.data.concat(data) ;             
+                    return{
+                    aggregateR: {
+                        ...state.aggregateR,
+                        labels:l,
+                        data:d
+                    }}
+                  });                     
                 }
-                //console.log(this.state.info[device])
-            ReactDOM.render(<Line  options= {
-                {
-                    
-                    responsive:true,
-                    legend: {
-                        display: true,
-                        labels: {
-                            fontColor: '#ffffff',
-                            fontSize: 20
-                        }
-                    },
-                
-                    scales: {
-                        yAxes: [{
-                            ticks: {
-                                beginAtZero: true,
-                                fontColor: "#ffffff"
-                            }
-                        }],
-                        
-                        xAxes:[{ 
-                            type:"time",
-                            distribution: "linear",
-                            time:{
-                                displayFormats:{
-                                    millisecond: "mm:ss:SSS"
-                                }
-                            },
-                            // time: {
-                            //     parser: 'MM/DD/YYYY HH:mm',
-                            //     // round: 'day'
-                            //     tooltipFormat: 'll HH:mm'
-                            // },
-                            ticks: {
-                                //beginAtZero: true,
-                                fontColor: "#ffffff",
-                                //stepSize:100
-                            },
-                            scaleLabel: {
-                                display: true,
-                                labelString: "Time",
-                                fontColor: "#ffffff",
-                                // stepSize: 100,
-                            }
-                        }]}}
-            }
-                data={this.state.aggregateR[0]}></Line>, document.getElementById('graphsagg'));
-            //console.log("here");
-            
+            ReactDOM.render(<LineChart label = "Total Power" backgroundColor = "rgba(0, 0, 200, 0.3)" pointBackgroundColor="rgb(0, 0, 200)" borderColor="rgba(0, 0, 200)" data={this.state.aggregateR.data} labels = {this.state.aggregateR.labels}/>, document.getElementById('graphsagg'));
             this.setState({
                 todayAgg: Math.round(sumNow),
                 thisMonthAgg: this.state.thisMonthDupAgg + Math.round(sumNow),
                 thisWeekAgg: this.state.thisWeekDupAgg + Math.round(sumNow),
-            })
-            
+            })    
             }) 
     }
 
@@ -566,7 +364,7 @@ class Dashboard extends Component{
         var firstDay = new Date(end.getFullYear(), end.getMonth(), 1);
         var endObj = new Date(end.getFullYear(),end.getMonth(),end.getDate());
         var weekBefore = new Date(end.getFullYear(), end.getMonth(),end.getDate()-7);
-        var dataUptoMonth = []
+        //var dataUptoMonth = []
 
         firestore.collection('dailyAggregateData').where("productId","==",productI).where("date",">=",firstDay)
         .where("date","<", endObj).orderBy("date").get()
@@ -574,63 +372,50 @@ class Dashboard extends Component{
         (querySnapshot)=>{
             var sum = 0;
             var sumWeek = 0;
-            this.state.aggregateD[0].datasets[0].data=[];
+            this.setState(prevstate=>({
+                aggregateD: {
+                    ...prevstate.aggregateD,
+                    data:[]
+                }
+            }))
+            //this.state.aggregateD.data=[];
             for (var i in querySnapshot.docs) {
                 const doc = querySnapshot.docs[i];
                 const YVal = doc.data().data;
                 const Obj = {
                     x: doc.data().date.toDate().getDate(),
                     y:YVal,
-                    r:15
+                    r:5
                 }
                 if (doc.data().date.toDate() >= weekBefore){
                     sumWeek += YVal;
                     console.log("thisweek")
                 }
-                
                 //this.state.barInfo[device].labels.push( months[month] + doc.data().timeStamp.toDate().getDate());
                 //this.state.barInfo[device].datasets[0].data.push(YVal);
-                this.state.aggregateD[0].datasets[0].data.push(Obj);
+                this.setState(state => {
+                    const data = state.aggregateD.data.concat(Obj)
+                    return{
+                    aggregateD: {
+                        ...state.aggregateD,
+                        data:data
+                    }}
+                  });
+                //this.state.aggregateD.data.push(Obj);
                 sum=sum+YVal;               
             }
-            this.state.aggregateD[0].datasets[0].label = this.state.aggregateD[0].datasets[0].label +"-"+ months[month];
-            
-            ReactDOM.render(<Bubble options= {
-                {
-                    legend: {
-                        display: true,
-                        labels: {
-                            fontColor: '#ffffff',
-                            fontSize: 20
-                        }
-                    },scales: {
-                        yAxes: [{
-                            ticks: {
-                                beginAtZero: true,
-                                fontColor: "#ffffff"
-                            }
-                        }],
-                        xAxes:[{
-                            ticks: {
-                                beginAtZero: true,
-                                fontColor: "#ffffff",
-                                stepSize:1
-                            },
-                            scaleLabel: {
-                                display: true,
-                                labelString: "Day",
-                                fontColor: "#ffffff",
-                            }
-                        }]}}
-            } data={this.state.aggregateD[0]}></Bubble>, document.getElementById('barsagg')); 
-            this.setState({
+            this.setState(prevstate=>({
+                aggregateD: {
+                    ...prevstate.aggregateD,
+                    label: "Total Power -"+ months[month]
+                },
                 thisMonthAgg: Math.round(sum+this.state.todayAgg),
                 thisMonthDupAgg: Math.round(sum),
                 thisWeekAgg: Math.round(sumWeek +this.state.todayAgg),
                 thisWeekDupAgg: Math.round(sumWeek),
-            }) 
-        
-        
+            }))
+            //this.state.aggregateD.label = this.state.aggregateD.label +"-"+ months[month];
+            ReactDOM.render(<BubbleChart label = {this.state.aggregateD.label} backgroundColor = "rgba(0, 0, 200, 0.3)" pointBackgroundColor="rgb(0, 0, 200)" borderColor="rgba(0, 0, 200)" data={this.state.aggregateD.data} labels = {this.state.aggregateD.labels}/>, document.getElementById('barsagg'));          
         })
     }
 
@@ -642,100 +427,36 @@ class Dashboard extends Component{
         .where("timeStamp","<=",now).orderBy("timeStamp")
         .get()
         .then(querySnapshot=>{
-            
-                this.state.aggregateM[0].datasets[0].data=[];
-                this.state.aggregateM[0].labels=[];
+            this.setState(prevstate=>({
+                aggregateM: {
+                    ...prevstate.aggregateM,
+                    data:[],
+                    labels:[]
+                }
+            }))
                 for (var i in querySnapshot.docs) {
                     const doc = querySnapshot.docs[i];
                     const YVal = doc.data().data;
                     const XVal = doc.data().month
                     if(YVal!==undefined & XVal!==undefined){
-                        this.state.aggregateM[0].datasets[0].data.push(YVal);
-                        this.state.aggregateM[0].labels.push(XVal);
+                        this.setState(state => {
+                            const data = state.aggregateM.data.concat(YVal);
+                            const labels = state.aggregateM.labels.concat(XVal);
+                            return{
+                            aggregateM: {
+                                ...state.aggregateM,
+                                data:data,
+                                labels: labels
+                            }}
+                          });
                     }                  
             }
             //console.log(this.state.barInfo[pro].datasets[0].data)
-            ReactDOM.render(<Bar options= {
-                {   layout:{
-                    padding:{
-                        left:10,
-                        right:10,
-                        top: 10,
-                        bottom:10
-                    }
-                },
-                    legend: {
-                        display: true,
-                        labels: {
-                            fontColor: '#ffffff',
-                            fontSize: 20
-                        }
-                    },scales: {
-                        yAxes: [{
-                            ticks: {
-                                beginAtZero: true,
-                                fontColor: "#ffffff"
-                            }
-                        }],
-                        xAxes:[{
-                            ticks: {
-                                beginAtZero: true,
-                                fontColor: "#ffffff"
-                            }
-                        }]}}
-            } data={this.state.aggregateM[0]}></Bar>, document.getElementById('bubbleagg')); 
-                
-        
+            ReactDOM.render(<BarChart label = {this.state.aggregateM.label} backgroundColor = "rgba(0, 0, 200, 0.3)" pointBackgroundColor="rgb(0, 0, 200)" borderColor="rgba(0, 0, 200)" data={this.state.aggregateM.data} labels = {this.state.aggregateM.labels}/>, document.getElementById('bubbleagg'));        
         })
     }
 
-//realtime listener function to capture power usage of devices real time
-//(if usage of each device is stored in one doc)
-    readDataRealTime(){
-    var product = this.state.userDetails.productId;
-    var deviceTypes=["tv","fridge","washing machine"];
-    this.houseRef = firestore.collection('powerData').where("productId","==", product).orderBy("timeFrameNo").onSnapshot(
-        (querySnapshot)=>{
-            for (var device in deviceTypes)
-            {var XVal=1;
-            this.state.info[device].labels=[];
-            this.state.info[device].datasets[0].data=[];
-            for (var i in querySnapshot.docs) {
-                const doc = querySnapshot.docs[i];
-                const YVal = doc.data()[deviceTypes[device]];
-                for (var j in YVal) {
-                    this.state.info[device].labels.push(XVal.toString());
-                    this.state.info[device].datasets[0].data.push(YVal[j]);
-                    XVal=XVal+1;
-            }                      
-            }
-            //console.log(this.state.info[device])
-            ReactDOM.render(<Line 
-                options = {{responsive:true, style:{backgroundColor:"#000000"},legend: {
-                    display: true,
-                    labels: {
-                        fontColor: '#ffffff',
-                        fontSize: 20
-                    }
-                },scales: {
-                    yAxes: [{
-                        ticks: {
-                            beginAtZero: true,
-                            fontColor: "#ffffff"
-                        }
-                    }],
-                    xAxes:[{
-                        ticks: {
-                            beginAtZero: true,
-                            fontColor: "#ffffff"
-                        }
-                    }]}
-                } }
-                data={this.state.info[device]}></Line>, document.getElementById('graphs'+device)); 
-                
-        }
-        })   
-    }
+
 //realtime listener function to capture power usage of devices real time
 //(if usage of each device is stored in seperate docs) New
     readDataRealTimeDevByDev(device,num){
@@ -745,108 +466,74 @@ class Dashboard extends Component{
         this.houseRef = firestore.collection('powerDataTest').where("device", "==", device).where("productId","==", product).where("timeFrameNo",">=",firstDay).orderBy("timeFrameNo").onSnapshot(
             (querySnapshot)=>{
                 var sumNow = 0;
-                var XVal=1;
-                this.state.info[num].labels=[];
-                this.state.info[num].datasets[0].data=[];
+                this.setState(prevState => ({
+                    info: prevState.info.map(
+                      (el,index) => index === num? { ...el, labels:[] , data:[]}: el
+                    )                 
+                  }))
+                // this.state.info[num].labels=[];
+                // this.state.info[num].data=[];
                 for (var i in querySnapshot.docs) {
                     const doc = querySnapshot.docs[i];
                     const time = (doc.data().timeFrameNo.seconds)*1000;
                     const YVal = doc.data()[device];
+                    const labels=[]
                     for (var j in YVal) {
-                        this.state.info[num].labels.push(new Date(time + (XVal-1)*3000));
-                        console.log(new Date(time + (XVal-1)*3));
-                        this.state.info[num].datasets[0].data.push(YVal[j]);
+                        labels.push(new Date(time + (j)*3000));
                         sumNow=sumNow+YVal[j];
-                        XVal=XVal+1;
-                }                      
+                    }
+                    this.setState(prevState => ({
+                        info: prevState.info.map(
+                          (el,index) => index === num? { ...el, labels: el.labels.concat(labels), data: el.data.concat(YVal) }: el
+                        )                      
+                      }))                   
                 }
-                //console.log(this.state.info[device])
-            ReactDOM.render(<Line  options= {
-                {
-                    
-                    responsive:true,
-                    legend: {
-                        display: true,
-                        labels: {
-                            fontColor: '#ffffff',
-                            fontSize: 20
-                        }
-                    },
-                
-                    scales: {
-                        yAxes: [{
-                            ticks: {
-                                beginAtZero: true,
-                                fontColor: "#ffffff"
-                            }
-                        }],
-                        
-                        xAxes:[{ 
-                            type:"time",
-                            distribution: "linear",
-                            time:{
-                                displayFormats:{
-                                    millisecond: "mm:ss:SSS"
-                                }
-                            },
-                            // time: {
-                            //     parser: 'MM/DD/YYYY HH:mm',
-                            //     // round: 'day'
-                            //     tooltipFormat: 'll HH:mm'
-                            // },
-                            ticks: {
-                                //beginAtZero: true,
-                                fontColor: "#ffffff",
-                                //stepSize:100
-                            },
-                            scaleLabel: {
-                                display: true,
-                                labelString: "Time",
-                                fontColor: "#ffffff",
-                                // stepSize: 100,
-                            }
-                        }]}}
+            ReactDOM.render(<LineChart label = {this.state.devices[num]} backgroundColor = "rgba(0, 0, 200, 0.3)" pointBackgroundColor="rgb(0, 0, 200)" borderColor="rgba(0, 0, 200)" data={this.state.info[num].data} labels = {this.state.info[num].labels}/>, document.getElementById('graphs'+ num));
+            this.setState(prevState => ({
+                uptoNow: prevState.uptoNow.map(
+                  (el,index) => index === num? sumNow : el
+                ),
+                dataUptoNow: prevState.dataUptoNow.map(
+                    (el,index) => index === num? { device:this.state.devices[num],value: sumNow }: el
+                  ) , 
+                sort:[],
+                sortDev:[]               
+              }))
+            //this.state.uptoNow[num]= sumNow; 
+            //this.state.dataUptoNow[num]= {device:this.state.devices[num],value: sumNow};
+            let lead = []; // the new empty object
+            // let's copy all user properties into it
+            for (let key in this.state.dataUptoNow) {
+            lead[key] = this.state.dataUptoNow[key];
             }
-                data={this.state.info[num]}></Line>, document.getElementById('graphs'+ num));
-            //console.log("here");
-            this.state.uptoNow[num]= sumNow;
-            this.state.dataUptoNow[num]= sumNow;
-            var lead = this.state.dataUptoNow;
             var sum = this.state.uptoNow.reduce(function(a, b){
                 return a + b;
             }, 0);
-            // console.log(this.state.uptoNow);
-            //console.log(lead);
-            if(lead.length === 3) {                 
-                for (var i in lead) {    
-                var max = lead.reduce(function(a, b) {
-                    return Math.max(a, b);
-                });
-                //console.log(max)
-                var ind = lead.indexOf(max);
-                //console.log(ind);
-                this.state.sort.push(lead[ind]);
-                this.state.sortDev.push(this.state.devices[ind])
-                lead[ind]=-1; 
-            }             
+            if (lead.length>=3){
+                lead.sort(function(a, b){return b.value-a.value});
+            const values=[];
+            const devices=[];
+            for (var k in lead){
+                values.push(lead[k].value);
+                devices.push(lead[k].device)
             }
-            //lead.sort();
-            // lead.reverse();
+            this.setState( {
+                sort: values,
+                sortDev: devices
+              });
+        }           
             this.setState({
                 today: Math.round(sum),
                 thisMonth: this.state.thisMonthDup + Math.round(sum),
-                thisWeek: this.state.thisWeekDup + Math.round(sum),
-                leadingConsumers: this.state.sort,
-                leadingConsumersNames: this.state.sortDev
-            })
-            
+                thisWeek: this.state.thisWeekDup + Math.round(sum)
+            }) 
+            this.readDailyDataSD();          
             }) 
     }
 
 //to get data on previous days of the current month
 //(if daily usage of each user is stored in seperate docs)
     readDailyDataSD(){
-        console.log("Daily Data");
         var productI = this.state.userDetails.productId;
         var deviceTypes = ["tv","fridge","washingmachine"];
         var months = ["Jan","Feb","Mar","April","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
@@ -863,158 +550,76 @@ class Dashboard extends Component{
         (querySnapshot)=>{
             var sum = 0;
             var sumWeek = 0;
+            var count=0
             for (var device in deviceTypes)
             {
                 //this.state.barInfo[device].labels=[];
                 var sumMonth = 0;
-                this.state.bubbleInfo[device].datasets[0].data=[];
+                this.setState(prevState => ({
+                    bubbleInfo: prevState.bubbleInfo.map(
+                      (el,index) => index === count? { ...el, data:[]}: el
+                    )                 
+                  }))
+               //this.state.bubbleInfo[device].data=[];
+               const Objs = [];
                 for (var i in querySnapshot.docs) {
                     const doc = querySnapshot.docs[i];
                     const YVal = doc.data()[deviceTypes[device]];
                     const Obj = {
                         x: doc.data().timeStamp.toDate().getDate(),
                         y:YVal,
-                        r:15
+                        r:5
                     }
                     if (doc.data().timeStamp.toDate() >= weekBefore){
                         sumWeek += YVal;
                         console.log("thisweek")
                     }
-                    
-                    //this.state.barInfo[device].labels.push( months[month] + doc.data().timeStamp.toDate().getDate());
-                    //this.state.barInfo[device].datasets[0].data.push(YVal);
-                    this.state.bubbleInfo[device].datasets[0].data.push(Obj);
+                    Objs.push(Obj);
+                    this.setState(prevState => ({
+                        bubbleInfo: prevState.bubbleInfo.map(
+                          (el,index) => index === count ? { ...el, data:el.data.concat(Obj) }: el
+                        )                      
+                      })) 
                     sum=sum+YVal;
-                    sumMonth = sumMonth + YVal;                
+                    sumMonth = sumMonth + YVal;   
+                              
             }
-
-            this.state.bubbleInfo[device].datasets[0].label = this.state.bubbleInfo[device].datasets[0].label +"-"+ months[month];
-            ReactDOM.render(<Bubble options= {
-                {
-                    legend: {
-                        display: true,
-                        labels: {
-                            fontColor: '#ffffff',
-                            fontSize: 20
-                        }
-                    },scales: {
-                        yAxes: [{
-                            ticks: {
-                                beginAtZero: true,
-                                fontColor: "#ffffff"
-                            }
-                        }],
-                        xAxes:[{
-                            ticks: {
-                                beginAtZero: true,
-                                fontColor: "#ffffff",
-                                stepSize:1
-                            },
-                            scaleLabel: {
-                                display: true,
-                                labelString: "Day",
-                                fontColor: "#ffffff",
-                            }
-                        }]}}
-            } data={this.state.bubbleInfo[device]}></Bubble>, document.getElementById('bars'+device)); 
-            this.setState({
+            ReactDOM.render(<BubbleChart label = {this.state.bubbleInfo[device].label  +"-"+ months[month]} backgroundColor = "rgba(0, 0, 200, 0.3)" pointBackgroundColor="rgb(0, 0, 200)" borderColor="rgba(0, 0, 200)" data={this.state.bubbleInfo[device].data} labels = {this.state.bubbleInfo[device].labels}/>, document.getElementById('bars'+device));
+            
+            this.setState(prevState=>({
                 thisMonth: Math.round(sum+this.state.today),
                 thisMonthDup: Math.round(sum),
                 thisWeek: Math.round(sumWeek +this.state.today),
                 thisWeekDup: Math.round(sumWeek),
-            }) 
-            this.state.uptoMonth[device] = sumMonth;
+                uptoMonth: prevState.uptoMonth.map(
+                    (el,index) => index === count ? sumMonth : el
+                  ) 
+            })) 
+            //this.state.uptoMonth[device] = sumMonth;
             dataUptoMonth[device]=sumMonth;
-     
+            count+=1
         }
         var sumUpto = this.state.uptoNow.map(function (num, idx) {
-            return num + dataUptoMonth[idx];
+            const obj = {device: deviceTypes[idx] ,value: num + dataUptoMonth[idx]};
+            return obj
           });
-        //var leadM = this.state.uptoMonth;
-        var leadM = sumUpto;
+    
+        let leadM = []; // the new empty object
+        for (let key in sumUpto) {
+            leadM[key] = sumUpto[key];
+        }
+        leadM.sort(function(a, b){return b.value-a.value});
         var sortM=[]
         var sortMDev =[]
-        for (var i in leadM){            
-            var max = leadM.reduce(function(a, b) {
-                return Math.max(a, b);
-            });
-            var ind = leadM.indexOf(max);
-            sortM.push(leadM[ind]);
-            sortMDev.push(this.state.devices[ind])
-            leadM[ind]=-1;            
+        for (var k in leadM){
+            sortM.push(leadM[k].value);
+            sortMDev.push(leadM[k].device)
         }
         this.setState({
             leadingConsumersM:sortM,
             leadingConsumersMNames: sortMDev,
-        })
-        })
-    }
-
-//to get data on previous days of the current month
-//(if daily usage of each user is stored in one doc)
-    readDailyDataOD(){
-        var productI = this.state.userDetails.productId;
-        var productTypes = ["total","tv","fridge","washingmachine"];
-        var months = ["Jan","Feb","Mar","April","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
-        var end = new Date(Date.now());
-        var month = end.getMonth();
-        var firstDay = new Date(end.getFullYear(), end.getMonth(), 1);
-        var endObj = new Date(end.getFullYear(),end.getMonth(),end.getDate());
-
-        firestore.collection('dailyPowerReadings').where("timeStamp",">=",firstDay)
-            .where("timeStamp","<", endObj).orderBy("timeStamp").get()
-            .then(
-            docSnapshots=>{
-                for (var product in productTypes)
-                {
-                this.state.bubbleInfo[product].labels=[];
-                this.state.bubbleInfo[product].datasets[0].data=[];
-                for (var j in docSnapshots.docs) {
-                    const doc = docSnapshots.docs[j];
-                    const Y = doc.data().data;
-                    //console.log(Y)
-                    for (var pro in Y){
-                        if ((Y[pro][productI])!== undefined){
-                            //console.log(Y[pro][productI])
-                            var YData = Y[pro][productI][productTypes[product]]
-                            // this.state.barInfo[product].labels.push( months[month] + doc.data().timeStamp.toDate().getDate());
-                            // this.state.barInfo[product].datasets[0].data.push(YData);
-                            const Obj ={
-                                x:doc.data().timeStamp.toDate().getDate(),
-                                y: YData,
-                                r:20
-                            }
-                            this.state.bubbleInfo[product].datasets[0].data.push(Obj);
-                            break;                     
-                        }
-                    }                                       
-                }
-                //console.log(this.state.barInfo[product])
-                ReactDOM.render(<Bubble options= {
-                    {   
-                        legend: {
-                            display: true,
-                            labels: {
-                                fontColor: '#ffffff',
-                                fontSize: 20
-                            }
-                        },scales: {
-                            yAxes: [{
-                                ticks: {
-                                    beginAtZero: true,
-                                    fontColor: "#ffffff"
-                                }
-                            }],
-                            xAxes:[{
-                                ticks: {
-                                    beginAtZero: true,
-                                    fontColor: "#ffffff",
-                                    stepSize:1
-                                }
-                            }]}}
-                } data={this.state.bubbleInfo[product]}></Bubble>, document.getElementById('bars'+product)); 
-            }              
-            })
+        })            
+        })       
     }
 
 //to get data on previous months of the year
@@ -1030,47 +635,20 @@ class Dashboard extends Component{
         .then(querySnapshot=>{
             for (var pro in productTypes)
             {
-                this.state.barInfo[pro].datasets[0].data=[];
+                this.state.barInfo[pro].data=[];
                 this.state.barInfo[pro].labels=[];
                 for (var i in querySnapshot.docs) {
                     const doc = querySnapshot.docs[i];
                     const YVal = doc.data()[productTypes[pro]];
                     const XVal = doc.data().month
                     if(YVal!==undefined & XVal!==undefined){
-                        this.state.barInfo[pro].datasets[0].data.push(YVal);
+                        this.state.barInfo[pro].data.push(YVal);
                         this.state.barInfo[pro].labels.push(XVal);
                     }                  
             }
             //console.log(this.state.barInfo[pro].datasets[0].data)
-            ReactDOM.render(<Bar options= {
-                {   layout:{
-                    padding:{
-                        left:10,
-                        right:10,
-                        top: 10,
-                        bottom:10
-                    }
-                },
-                    legend: {
-                        display: true,
-                        labels: {
-                            fontColor: '#ffffff',
-                            fontSize: 20
-                        }
-                    },scales: {
-                        yAxes: [{
-                            ticks: {
-                                beginAtZero: true,
-                                fontColor: "#ffffff"
-                            }
-                        }],
-                        xAxes:[{
-                            ticks: {
-                                beginAtZero: true,
-                                fontColor: "#ffffff"
-                            }
-                        }]}}
-            } data={this.state.barInfo[pro]}></Bar>, document.getElementById('bubble'+pro)); 
+            ReactDOM.render(<BarChart label = {this.state.barInfo[pro].label} backgroundColor = "rgba(0, 0, 200, 0.3)" pointBackgroundColor="rgb(0, 0, 200)" borderColor="rgba(0, 0, 200)" data={this.state.barInfo[pro].data} labels = {this.state.barInfo[pro].labels}/>, document.getElementById('bubble'+pro));
+            
                 
         }
         })
@@ -1180,7 +758,7 @@ class Dashboard extends Component{
         })
     }
 
-    render(){     
+    render(){    
         return(
                 <div className="dashboard">
                     <div className="row">
@@ -1254,8 +832,19 @@ class Dashboard extends Component{
                                     </CardBody>
                                 </Card>
                             </div>
-                        </div>
-                        <div className="col-12 col-md-9 align-self-start">
+                        </div>     
+                 <div className="col-12 col-md-9 align-self-start" id="data">
+                 { this.state.userDetails.productId === "" ? 
+                    <div className="container mb-3">
+                    <Card >
+                    <CardBody>
+                        <CardTitle className="text-center">
+                            No power data to be shown as product ID is not specified. Please proceed to edit your bio in order to add the product ID.
+                        </CardTitle>
+                    </CardBody>
+                </Card>
+                </div>
+                 : null}
                         <div className="container">
                                 <Card style={{backgroundColor:"#646464", color:'#000000'}}>
                                 <CardBody>
@@ -1265,11 +854,9 @@ class Dashboard extends Component{
                                 <div className="card-counter primary">
                                     <i className="fa fa-clock-o"></i>
                                     <span className="count-name">Today</span>
-                                <span className="count-numbers">{this.state.todayAgg}</span>
-                                    
+                                <span className="count-numbers">{this.state.todayAgg}</span>    
                                 </div>
                                 </div>
-
                                 <div className="col-md-4">
                                 <div className="card-counter danger">
                                     <i className="fa fa-calendar"></i>
@@ -1277,7 +864,6 @@ class Dashboard extends Component{
                                     <span className="count-name">Last 7 days</span>
                                 </div>
                                 </div>
-
                                 <div className="col-md-4">
                                 <div className="card-counter success">
                                     <i className="fa fa-area-chart"></i>
@@ -1285,8 +871,6 @@ class Dashboard extends Component{
                                     <span className="count-name">Current billing period</span>
                                 </div>
                                 </div>
-                               
-
                             </div>
                             </CardBody>
                             </Card>
@@ -1299,55 +883,25 @@ class Dashboard extends Component{
                                 <Tab eventKey="now" title="Current" className="tab-item">
                                     <div id="notify">
                                     </div>
-                            
-                                    <br></br><br></br>
-                                    
-                                    <div className="row">
-                                    <div className="col-12 col-md-2"></div>
-                                    <div className="col-12 col-md-8" id='graphsagg' style={{position: "relative", backgroundColor:"#152238", borderRadius:"10px"}}>
+                                    <div className="col-12" id='graphsagg' style={{position: "relative", backgroundColor:"#152238", borderRadius:"10px"}}>
                                     </div>
-                                    </div>
-                                    
-                                    <br></br><br></br>
-                                    
-
-            
                                 </Tab>
                                 <Tab eventKey="daily" title="Daily" className="tab-item ">
                                     <div id="notifyD">
-                                    </div>
-                                    <br></br><br></br>
-                                    
-                                    <div className="row">
-                                    <div className="col-12 col-md-1"></div>
-                                    <div className="col-12 col-md-8" id='barsagg' style={{position: "relative", backgroundColor:"#152238", borderRadius:"10px"}}>
-                                    </div>
-                                    </div>
-                                    
-                                    <br></br><br></br>
-                                    
-                                   
+                                    </div>   
+                                    <div className="col-12 " id='barsagg' style={{position: "relative", backgroundColor:"#152238", borderRadius:"10px"}}>
+                                    </div>                                   
                                 </Tab>
                                 <Tab eventKey="monthly" title="Monthly" className="tab-item">
                                 <div id="notifyM">
-                                    </div>
-                            
-                                    <br></br><br></br>
-                                    
-                                    <div className="row">
-                                    <div className="col-12 col-md-2"></div>
-                                    <div className="col-12 col-md-8" id='bubbleagg' style={{position: "relative", backgroundColor:"#152238", borderRadius:"10px"}}>
-                                    </div>
-                                    </div>
-                                    
-                                    <br></br><br></br>
+                                    </div> 
+                                    <div className="col-12" id='bubbleagg' style={{position: "relative", backgroundColor:"#152238", borderRadius:"10px"}}>
+                                    </div>    
                                 </Tab>
                             </Tabs>
                             </CardBody>
                             </Card>
-                            </div>
-                            
-                            
+                            </div>                            
                             <div className="container mt-4">
                                 <Card style={{backgroundColor:"#646464", color:'#000000'}}>
                                 <CardBody>
@@ -1357,11 +911,9 @@ class Dashboard extends Component{
                                 <div className="card-counter primary">
                                     <i className="fa fa-clock-o"></i>
                                     <span className="count-name">Today</span>
-                                <span className="count-numbers">{this.state.today}</span>
-                                    
+                                <span className="count-numbers">{this.state.today}</span>    
                                 </div>
                                 </div>
-
                                 <div className="col-md-4">
                                 <div className="card-counter danger">
                                     <i className="fa fa-calendar"></i>
@@ -1369,7 +921,6 @@ class Dashboard extends Component{
                                     <span className="count-name">Last 7 days</span>
                                 </div>
                                 </div>
-
                                 <div className="col-md-4">
                                 <div className="card-counter success">
                                     <i className="fa fa-area-chart"></i>
@@ -1377,13 +928,10 @@ class Dashboard extends Component{
                                     <span className="count-name">Current billing period</span>
                                 </div>
                                 </div>
-                               
-
                             </div>
                             </CardBody>
                             </Card>
                             </div>
-
                             <div className="container mt-4">
                                 <Card style={{backgroundColor:"#646464", color:'#000000'}}>
                                     <CardBody>
@@ -1394,43 +942,46 @@ class Dashboard extends Component{
                                 <div className="col-md-4">
                                 <div className="card-consumer large">
                                     <i className="fa fa-fire"></i>
-                                <span className="count-name-large">{this.state.leadingConsumersNames[0]}</span>
-                                <span className="count-numbers-large">{Math.round(this.state.leadingConsumers[0])}</span>
-                                    
+                                {this.state.sort.length >=3 ? 
+                                <React.Fragment>
+                                <span className="count-name-large">{this.state.sortDev[0]}</span>
+                                <span className="count-numbers-large">{Math.round(this.state.sort[0])}</span> </React.Fragment>  : null 
+                                }
                                 </div>
                                 </div>
-
                                 <div className="col-md-4">
                                 <div className="card-consumer medium">
                                     <i className="fa fa-fire"></i>
-                                <span className="count-numbers-medium">{Math.round(this.state.leadingConsumers[1])}</span>
-                                    <span className="count-name-medium">{this.state.leadingConsumersNames[1]}</span>
+                                    {this.state.sort.length >=3 ? 
+                                <React.Fragment>
+                                <span className="count-numbers-medium">{Math.round(this.state.sort[1])}</span>
+                                    <span className="count-name-medium">{this.state.sortDev[1]}</span>
+                                    </React.Fragment>  : null 
+                                }
                                 </div>
                                 </div>
-
                                 <div className="col-md-4">
                                 <div className="card-consumer small">
                                     <i className="fa fa-fire"></i>
-                                <span className="count-numbers-small">{Math.round(this.state.leadingConsumers[2])}</span>
-                                    <span className="count-name-small">{this.state.leadingConsumersNames[2]}</span>
+                                    {this.state.sort.length >=3  ? 
+                                <React.Fragment>
+                                <span className="count-numbers-small">{Math.round(this.state.sort[2])}</span>
+                                    <span className="count-name-small">{this.state.sortDev[2]}</span>
+                                    </React.Fragment>  : null 
+                                }
                                 </div>
                                 </div>
-                               
-
                             </div>           
                                 </Tab>
-                
                                 <Tab eventKey="monthly" title="This Month" className="tab-consumer-item">
                                 <div className="row">
                                 <div className="col-md-4">
                                 <div className="card-consumer large">
                                     <i className="fa fa-fire"></i>
                                 <span className="count-name-large">{this.state.leadingConsumersMNames[0]}</span>
-                                <span className="count-numbers-large">{Math.round(this.state.leadingConsumersM[0])}</span>
-                                    
+                                <span className="count-numbers-large">{Math.round(this.state.leadingConsumersM[0])}</span>   
                                 </div>
                                 </div>
-
                                 <div className="col-md-4">
                                 <div className="card-consumer medium">
                                     <i className="fa fa-fire"></i>
@@ -1438,7 +989,6 @@ class Dashboard extends Component{
                                     <span className="count-name-medium">{this.state.leadingConsumersMNames[1]}</span>
                                 </div>
                                 </div>
-
                                 <div className="col-md-4">
                                 <div className="card-consumer small">
                                     <i className="fa fa-fire"></i>
@@ -1446,18 +996,12 @@ class Dashboard extends Component{
                                     <span className="count-name-small">{this.state.leadingConsumersMNames[2]}</span>
                                 </div>
                                 </div>
-                               
-
-                            </div>  
-
-                                </Tab>
-                                
+                            </div>
+                                </Tab>    
                             </Tabs>
-
                                     </CardBody>
                                 </Card>
                             </div>
-                            
                             <div className="container mt-4">
                             <Card>
                             <CardBody>
@@ -1467,117 +1011,42 @@ class Dashboard extends Component{
                                     <div id="notify">
                                     </div>
                                 
-                                    {/* <div className="row equip-choose">
-                                    <div className="form-check col-4">
-                                        <input type="checkbox" className="form-check-input" id="showWashingMachine"></input>
-                                        <label className="form-check-label" htmlFor="showWashingMachine">Washing machine</label>
-                                    </div>
-                                    <div className="form-check col-4">
-                                        <input type="checkbox" className="form-check-input" id="showTV"></input>
-                                        <label className="form-check-label" htmlFor="showTV">TV</label>
-                                    </div>
-                                    <div className="form-check col-4">
-                                        <input type="checkbox" className="form-check-input" id="showFridge"></input>
-                                        <label className="form-check-label" htmlFor="showFridge">Fridge</label>
-                                    </div>
-                                    </div> */}
-                            
-                                    <br></br><br></br>
                                     
-                                    <div className="row">
-                                    <div className="col-12 col-md-2"></div>
-                                    <div className="col-12 col-md-8" id='graphs0' style={{position: "relative", backgroundColor:"#152238", borderRadius:"10px"}}>
-                                    </div>
+                                    <div className="col-12 mb-4" id='graphs0' style={{position: "relative", backgroundColor:"#152238", borderRadius:"10px"}}>
                                     </div>
                                     
-                                    <br></br><br></br>
-                                    
-                                    <div className="row">
-                                    <div className="col-12 col-md-3"></div>
-                                    <div className="col-12 col-md-8" id='graphs1' style={{position: "relative", backgroundColor:"#152238", borderRadius:"10px"}}>
-                                    </div>
+                                    <div className="col-12 mb-4" id='graphs1' style={{position: "relative", backgroundColor:"#152238", borderRadius:"10px"}}>
                                     </div>
                                     
-                                    <br></br><br></br>
-                                    
-                                    <div className="row">
-                                    <div className="col-12 col-md-2"></div>
-                                    <div className="col-12 col-md-8" id='graphs2' style={{position: "relative", backgroundColor:"#152238", borderRadius:"10px"}}>
+                                   
+                                    <div className="col-12 mb-4" id='graphs2' style={{position: "relative", backgroundColor:"#152238", borderRadius:"10px"}}>
                                     </div>
-                                    </div>
-                                
-                                    <br></br><br></br>
-
-            
+                                   
                                 </Tab>
                                 <Tab eventKey="daily" title="Daily" className="tab-item ">
                                     <div id="notifyD">
                                     </div>
-                                    <br></br><br></br>
                                     
-                                    <div className="row">
-                                    <div className="col-12 col-md-1"></div>
-                                    <div className="col-12 col-md-8" id='bars0' style={{position: "relative", backgroundColor:"#152238", borderRadius:"10px"}}>
-                                    </div>
+                                    <div className="col-12 mb-4" id='bars0' style={{position: "relative", backgroundColor:"#152238", borderRadius:"10px"}}>
                                     </div>
                                     
-                                    <br></br><br></br>
-                                    
-                                    <div className="row">
-                                    <div className="col-12 col-md-3"></div>
-                                    <div className="col-12 col-md-8" id='bars1' style={{position: "relative", backgroundColor:"#152238", borderRadius:"10px"}}>
-                                    </div>
+                                    <div className="col-12 mb-4" id='bars1' style={{position: "relative", backgroundColor:"#152238", borderRadius:"10px"}}>
                                     </div>
                                     
-                                    <br></br><br></br>
+                                    <div className="col-12 mb-4" id='bars2' style={{position: "relative", backgroundColor:"#152238", borderRadius:"10px"}}>
+                                    </div>
                                     
-                                    <div className="row">
-                                    <div className="col-12 col-md-1"></div>
-                                    <div className="col-12 col-md-8" id='bars2' style={{position: "relative", backgroundColor:"#152238", borderRadius:"10px"}}>
-                                    </div>
-                                    </div>
-
-                                    <br></br><br></br>
-                                    
-                                    {/* <div className="row">
-                                    <div className="col-12 col-md-3"></div>
-                                    <div className="col-12 col-md-8" id='bars3' style={{position: "relative", backgroundColor:"#152238", borderRadius:"10px"}}>
-                                    </div>
-                                    </div>
-
-                                    <br></br><br></br> */}
                                 
                                 </Tab>
                                 <Tab eventKey="monthly" title="Monthly" className="tab-item">
                                 <div id="notifyM">
                                     </div>
-                            
-                                    <br></br><br></br>
-                                    
-                                    <div className="row">
-                                    <div className="col-12 col-md-2"></div>
-                                    <div className="col-12 col-md-8" id='bubble0' style={{position: "relative", backgroundColor:"#152238", borderRadius:"10px"}}>
+                                    <div className="col-12 mb-4" id='bubble0' style={{position: "relative", backgroundColor:"#152238", borderRadius:"10px"}}>
                                     </div>
+                                    <div className="col-12 mb-4" id='bubble1' style={{position: "relative", backgroundColor:"#152238", borderRadius:"10px"}}>
                                     </div>
-                                    
-                                    <br></br><br></br>
-                                    
-                                    <div className="row">
-                                    <div className="col-12 col-md-3"></div>
-                                    <div className="col-12 col-md-8" id='bubble1' style={{position: "relative", backgroundColor:"#152238", borderRadius:"10px"}}>
+                                    <div className="col-12 mb-4" id='bubble2' style={{position: "relative", backgroundColor:"#152238", borderRadius:"10px"}}>
                                     </div>
-                                    </div>
-                                    
-                                    <br></br><br></br>
-                                    
-                                    <div className="row">
-                                    <div className="col-12 col-md-2"></div>
-                                    <div className="col-12 col-md-8" id='bubble2' style={{position: "relative", backgroundColor:"#152238", borderRadius:"10px"}}>
-                                    </div>
-                                    </div>
-                                
-                                    <br></br><br></br>
-
                                 </Tab>
                                 <Tab eventKey="evaluation" title="Evaluation" className="tab-item">
                                 <div id="notifyE">
@@ -1612,8 +1081,6 @@ class Dashboard extends Component{
                                     <div className="col-12 col-md-8" id='pie0' style={{position: "relative", backgroundColor:"#152238", borderRadius:"10px"}}>
                                     </div>
                                     </div>
-                                    
-                    
                                 
                                     <br></br><br></br>
                                     </div>
@@ -1621,11 +1088,7 @@ class Dashboard extends Component{
                             </Tabs>
                             </CardBody>
                             </Card>
-                            </div>
-                            
-                            
-                            
-                            
+                            </div>    
                         </div>
                     </div>
                 </div>

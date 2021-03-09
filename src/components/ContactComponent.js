@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
-import {Breadcrumb, BreadcrumbItem} from 'reactstrap';
-import {Link} from 'react-router-dom';
+// import {Breadcrumb, BreadcrumbItem} from 'reactstrap';
+// import {Link} from 'react-router-dom';
 //import {Carousel} from 'react-bootstrap';
 
 class Contact extends Component{
